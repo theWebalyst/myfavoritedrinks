@@ -18,6 +18,7 @@
 
     RemoteStorage.config.changeEvents.window = true;
     remoteStorage.access.claim('myfavoritedrinks', 'rw');
+    remoteStorage.setApiKeys('safestore', { appKey: 'your-app-key' }); // mrhTODO
     remoteStorage.displayWidget();
     remoteStorage.myfavoritedrinks.init();
     remoteStorage.myfavoritedrinks.on('change', function(event) {
