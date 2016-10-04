@@ -22,7 +22,7 @@
     // mrhTODO - review...
     // SAFE Network backend requires application identity and required permissions rather than
     // API keys (authentication is handled by the user via SAFE Launcher, not a server)
-    remoteStorage.setApiKeys('safenetwork', 
+    remoteStorage.setApiKeys('safestore', 
 		{	
             // For details see SAFE Launcher /auth JSON API
 			app: {
@@ -38,11 +38,9 @@
 //remoteStorage.disconnect();//mrhTODO disconnect() to start with a clean slate every time
 
     // Googledrive option
-    /*
-remoteStorage.setApiKeys('googledrive', {
+    remoteStorage.setApiKeys('googledrive', {
        clientId: '857377956471-0qma3pqj34k7sio6d17bhnu3rvjqu57e.apps.googleusercontent.com'
     });
-    */
     
     remoteStorage.displayWidget();
     remoteStorage.myfavoritedrinks.init();
