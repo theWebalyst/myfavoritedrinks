@@ -29,9 +29,9 @@
 			    name: 'RemoteStorage Demo',		// Your app name etc.
 			    version: '0.0.1',
 			    vendor: 'remoteStorage',
-			    id: 'org.remotestorage.rsdemo'	// Identifies stored data (unique per vendor)
+			    id: 'org.remotestorage.rsdemo',      // Identifies stored data (unique per vendor)
+		        permissions: ['SAFE_DRIVE_ACCESS']   // List of permissions to request. On authorisation, 
 			},
-			permissions: ['SAFE_DRIVE_ACCESS']  // List of permissions to request. On authorisation, 
 												// holds permissions granted by user
 		}
     ); 

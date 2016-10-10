@@ -13698,9 +13698,16 @@ Math.uuid = function (len, radix) {
 
 
 /** FILE: src/safenetwork.js **/
+// For now, the safenetwork.js backend requires RS.js built with different LAUNCHER_URL (see below)
+// according to the test environment.
+//
+// Note: during SAFEnetwork testing the SAFE API is changing regularly, so if you want to build RS.js with this backend
+//       yourself, you will need to make sure that the version of safestore.js is in step with that API of the SAFEnetwork
+//       you are connecting to at the time (which changes periodically). If in doubt ask webalyst (aka happybeing).
+
 LAUNCHER_URL = 'http://localhost:8100'; // For local tests - but use http://api.safenet when live on SAFEnetwork
-//LAUNCHER_URL = 'http://api.safenet'; // Client device must be running SAFE Launcher which provides REST API
-//LAUNCHER_URL = 'safe://api.safenet'; // For SAFE Beaker Browser
+//LAUNCHER_URL = 'http://api.safenet'; // For live tests using Firefox/Chrome with proxy configured, and running SAFE Launcher locally
+//LAUNCHER_URL = 'safe://api.safenet'; // For SAFE Beaker Browser, no proxy needed, and running SAFE Launcher locally
 
 (function (global) {
   /**
@@ -13814,7 +13821,7 @@ LAUNCHER_URL = 'http://localhost:8100'; // For local tests - but use http://api.
     online: true,
     isPathShared: true,         // App private storage mrhTODO shared or private? app able to control?
     launcherUrl: LAUNCHER_URL,  // Can be overridden by App
-
+        
     configure: function (settings) { // Settings parameter compatible with WireClient
       // mrhTODO: review dropbox approach later
       
@@ -13852,6 +13859,44 @@ LAUNCHER_URL = 'http://localhost:8100'; // For local tests - but use http://api.
     },
 
     safenetworkAuthorize: function (appApiKeys) {
+      var self = this;
+
+      // Session data
+      this.launcherUrl = LAUNCHER_URL;
+      // App can override url by setting appApiKeys.laucherURL
+      if ( typeof appApiKeys.launcherURL !== 'undefined' ) { this.launcherUrl = appApiKeys.launcherURL;  }
+      // JSON string ("payload") for POST
+      this.payload = appApiKeys;     // App calls setApiKeys() to configure persistent part of "payload"
+
+      // The request...
+      var options = {
+        url: this.launcherUrl + '/auth',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.payload)
+      };
+
+      return window.safeAuth.authorise(appApiKeys.app).then( function(res) {   // mrhTODO - am leaving off local storage key
+      /* window.safeAuth.authorise(this.app, this.LOCAL_STORAGE_TOKEN_KEY)
+        if (typeof res === 'object') {
+          this.setAuthToken(res.__parsedResponseBody__.token);
+        }
+        */
+        // Save session info
+        self.configure({ 
+            token:          res.__parsedResponseBody__.token,        // Auth token
+            permissions:    res.__parsedResponseBody__.permissions,  // List of permissions approved by the user
+          });
+
+      }, (err) => {
+        RS.log('SafeNetwork Authorisation Failed');
+        RS.log(err);
+        return this;
+      });
+    },
+    
+    OLDsafenetworkAuthorize: function (appApiKeys) {
       var self = this;
 
       // Session data
@@ -14395,6 +14440,7 @@ LAUNCHER_URL = 'http://localhost:8100'; // For local tests - but use http://api.
   //    2) it uses hookIt() (and in _rs_cleanup() unHookIt()) instead of inline assignements
   //       which causes dropbox version  to also call hookSync() and hookGetItemURL()
   RS.SafeNetwork._rs_init = function (remoteStorage) {
+
     var config = remoteStorage.apiKeys.safenetwork;
     if (config) {
       remoteStorage.safenetwork = new RS.SafeNetwork(remoteStorage, config.clientId);
