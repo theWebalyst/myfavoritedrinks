@@ -6253,6 +6253,7 @@ RemoteStorage.Assets = {
   safenetwork: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4AkGFSoWc7mUbQAABKJJREFUWMPll0tsVkUUx39z+6CCCIoPUIglQl1oSoCpUUuI6MLEhYkvlE7RyEYSoQPUQMQgmCjBSEKnaFjyKPOBiQlxoUYFMUYQ7HwEFkZRlEgVLYIYKFX6uOOC+drpl360tMbEeJObO+fcM/M/c15zBv7vjxjqxCc3utHFKUeB9lJKKzbrynQo6yRDVaA45QtgAnBbBx37hrpOMgzrlUXjUUPeyGCEVEO2AuFfBvZYLTcH9lxgP3AReLRH1rjFQBXwotXy52HHwLyGQ8WJSDsj1s1Wy18C2DHgrNWyCqDGNFcKxJEg562WybBdkIj0uj4ae3FL3nzRuxtxRyyqjKtXDa7kihRQxlWohubnao0bCWC1PAWsDb9PkKTZSLwIKOlVzu8EfgLOA2eB9Qj+VMbdrYxbWNvgJl3WBTUmO1HgWwLZYbUcEZS6HfgGWGa13BB47wEPBdnNVssF/WxmPrAtYvkkTUc3Lb3rQr8WEPj7IrJUGff0ZaxXHo0fURu+HJcvYLVsAl6KIdIkqSyYBUKIt733Bsj5fasybhWIVeABuqNg0HjxcaDGkiSnlXHvA4uA2Qha8GwFJkYQrb4zOVgwBrbXzewEtgSEcmANMAX8jiBiVGOIjbqq3d77Equl8HAr8FFwyQ/AFjx7Avhyq6UgZYzVcnzmhRnpQFkQgsqnVstXgIo+fz2v5YaZJVVdABktT1gtHwQO5K31hNXyDQC7VJ4bVB1Qxm0CFgITc4VEGfc5UA20AyND8bkfOAWkICaD3x2WOA+MBrqCi3cDC4JbW6yWvxdUQBk3CmgL5D6r5azAnwp8C9QBI4BXwzd+2oFFUaVEGbcXmB1b2uPLMrrqYv8uEMyLqGpl3DV5csVWy/VWyzLgx0j2K6vlqBg8ZMEcYEbfQE/uLRwDnp2RaQ5Y3eO3XOB0RdKZSPG3CuWq1fII0NLLSfcXVMBq2eZhPDCtLU2ro18hM1itTDYJsiuDFQ7bOrkJYG7joRJl3FllnFfGvRNtbDIwXcA4W9dr/n5Pw4yWrUBrT3VsdBV4cmYb54WfBXwW6O64NpT4dDUwNpCPqUZ3va2Tp+0S2Q0cHvRhpIy7OnzXCM/RPhN84iIyBbprjLtBGfdhXtUDz2/KuPqw1uQB07CmIVsihD+X12wcA2qBOxPY1RTSSBn3QEixzuhA+iBJ0ufTNClUCX0KZTu07Oi/FMO8PPBnrJa5w+RgnvJvRoXrD9Jkil0640zgHQ/fScq4FcC6HEQRPBUfUH0U8EX+E9FbKC9G4JGV3LVCcBwYE7F3ReD5Xt4I6boenwmxd4BKmJ0Kfg6I7VbPbA/mXgssDsXmxiCqw9tmtZwGUNvQLLwQJ0IgrrRabrw0v3kCiHohyGyvk4euqCWbb9xNKfwasT4FlNXypDLu+9CSSQDV6B7G825Pt9JddNW2ZdP/GlZL1p2Unu4b2P5xq+XJHjKc08q412NwwA8EPigFMosru72gArDAsxlddSYAzgwRXq6MawWWA18D9UBTXvT/8zcjZdx3l3oFCKm4Iteu/VsXk9i82aGAD/pi0t/TlST3FKfpUeBCR0dp9X/2dvw3btu9oQAAJJkAAAAASUVORK5CYII=',
   syncIcon: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDg3LjUgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTUuOTk5OTk5IDE2IiB3aWR0aD0iMTYiIHZlcnNpb249IjEuMSIgeT0iMHB4IiB4PSIwcHgiIHhtbG5zOmNjPSJodHRwOi8vY3JlYXRpdmVjb21tb25zLm9yZy9ucyMiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC01LjUxMTIgLTc2LjUyNSkiIGRpc3BsYXk9Im5vbmUiPgoJPHBhdGggZGlzcGxheT0iaW5saW5lIiBkPSJtNTEuNDczIDQyLjI1NS0yLjIwNSAyLjIxMmMxLjQ3OCAxLjQ3NyAyLjI5NSAzLjQ0MiAyLjI5NSA1LjUzMyAwIDQuMzA5LTMuNTA0IDcuODEyLTcuODEyIDcuODEydi0xLjU2MmwtMy4xMjUgMy4xMjUgMy4xMjQgMy4xMjV2LTEuNTYyYzYuMDI5IDAgMTAuOTM4LTQuOTA2IDEwLjkzOC0xMC45MzggMC0yLjkyNy0xLjE0MS01LjY3Ni0zLjIxNS03Ljc0NXoiLz4KCTxwYXRoIGRpc3BsYXk9ImlubGluZSIgZD0ibTQ2Ljg3NSA0MC42MjUtMy4xMjUtMy4xMjV2MS41NjJjLTYuMDMgMC0xMC45MzggNC45MDctMTAuOTM4IDEwLjkzOCAwIDIuOTI3IDEuMTQxIDUuNjc2IDMuMjE3IDcuNzQ1bDIuMjAzLTIuMjEyYy0xLjQ3Ny0xLjQ3OS0yLjI5NC0zLjQ0Mi0yLjI5NC01LjUzMyAwLTQuMzA5IDMuNTA0LTcuODEyIDcuODEyLTcuODEydjEuNTYybDMuMTI1LTMuMTI1eiIvPgo8L2c+CjxwYXRoIGZpbGw9IiNmZmYiIGQ9Im0xMCAwbC0wLjc1IDEuOTA2MmMtMS4wMDc4LTAuMjk0Mi0zLjQ1ODYtMC43NzA4LTUuNjU2MiAwLjkzNzYgMC0wLjAwMDItMy45MzAyIDIuNTk0MS0yLjA5MzggNy41OTQybDEuNjU2Mi0wLjcxOTJzLTEuNTM5OS0zLjExMjIgMS42ODc2LTUuNTMxM2MwIDAgMS42OTU3LTEuMTMzOSAzLjY4NzQtMC41OTM3bC0wLjcxODcgMS44MTI0IDMuODEyNS0xLjYyNS0xLjYyNS0zLjc4MTJ6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0ibTE0IDUuNTYyNWwtMS42NTYgMC43MTg3czEuNTQxIDMuMTEzNS0xLjY4OCA1LjUzMDhjMCAwLTEuNzI3MiAxLjEzNS0zLjcxODUgMC41OTRsMC43NS0xLjgxMi0zLjgxMjUgMS41OTQgMS41OTM4IDMuODEyIDAuNzgxMi0xLjkwNmMxLjAxMTMgMC4yOTUgMy40NjE1IDAuNzY2IDUuNjU2LTAuOTM4IDAgMCAzLjkyOC0yLjU5NCAyLjA5NC03LjU5MzV6Ii8+Cjwvc3ZnPgo=',
   widget: '<div class="rs-bubble rs-hidden">   <div class="rs-bubble-text remotestorage-initial remotestorage-error remotestorage-authing remotestorage-offline">     <span class="rs-status-text">{{view_connect}}</span>   </div>   <div class="rs-bubble-expandable">     <!-- error -->     <div class="remotestorage-error">       <pre class="rs-status-text rs-error-msg">{{ERROR_MSG}}</pre>       <button class="remotestorage-reset">{{view_get_me_out}}</button>       <p class="rs-centered-text rs-error-plz-report">{{view_error_plz_report}}</p>     </div>     <!-- connected -->     <div class="rs-bubble-text remotestorage-connected">       <strong class="userAddress">{{USER_ADDRESS}}</strong>       <p class="remotestorage-unauthorized">{{view_unauthorized}}</p>       <p class="remotestorage-invalid-key">{{view_invalid_key}}</p>       <form novalidate class="remotestorage-cipher-form">         <input placeholder="Secret key" name="userSecretKey" novalidate>         <button class="rs-cipher" name="rs-cipher" title="cipher" disabled="disabled">           <img>         </button>         <button class="rs-nocipher" name="rs-nocipher" title="no cipher">           <img>         </button>       </form>     </div>     <div class="rs-content remotestorage-connected">       <button class="rs-sync" title="sync"><img></button>       <button class="rs-disconnect" title="disconnect"><img></button>     </div>     <!-- initial -->     <form novalidate class="remotestorage-initial">       <input type="email" placeholder="user@provider.com" name="userAddress" novalidate>       <button class="connect" name="connect" title="connect" disabled="disabled">         <img>       </button>     </form>     <div class="rs-info-msg remotestorage-initial">{{view_info}}</div>   </div> </div> <img class="rs-dropbox rs-backends rs-action" alt="Connect to Dropbox"> <img class="rs-googledrive rs-backends rs-action" alt="Connect to Google Drive"> <img class="rs-safenetwork rs-backends rs-action" alt="Connect to SAFE Network"> <img class="rs-cube rs-action"> ',
+  widgetCss: '/** encoding:utf-8 **/ /* RESET */ #remotestorage-widget{text-align:left;}#remotestorage-widget input, #remotestorage-widget button{font-size:11px;}#remotestorage-widget form input[type=email]{margin-bottom:0;/* HTML5 Boilerplate */}#remotestorage-widget form input[type=submit]{margin-top:0;/* HTML5 Boilerplate */}/* /RESET */ #remotestorage-widget, #remotestorage-widget *{-moz-box-sizing:border-box;box-sizing:border-box;}#remotestorage-widget{position:absolute;right:10px;top:10px;font:normal 16px/100% sans-serif !important;user-select:none;-webkit-user-select:none;-moz-user-select:-moz-none;cursor:default;z-index:10000;}#remotestorage-widget .rs-bubble{background:rgba(80, 80, 80, .7);border-radius:5px 15px 5px 5px;color:white;font-size:0.8em;padding:5px;position:absolute;right:3px;top:9px;min-height:24px;white-space:nowrap;text-decoration:none;}.rs-bubble .rs-bubble-text{padding-right:32px;/* make sure the bubble doesn\'t "jump" when initially opening. */ min-width:182px;}#remotestorage-widget .rs-action{cursor:pointer;}/* less obtrusive cube when connected */ #remotestorage-widget.remotestorage-state-connected .rs-cube, #remotestorage-widget.remotestorage-state-busy .rs-cube{opacity:.3;-webkit-transition:opacity .3s ease;-moz-transition:opacity .3s ease;-ms-transition:opacity .3s ease;-o-transition:opacity .3s ease;transition:opacity .3s ease;}#remotestorage-widget.remotestorage-state-connected:hover .rs-cube, #remotestorage-widget.remotestorage-state-busy:hover .rs-cube, #remotestorage-widget.remotestorage-state-connected .rs-bubble:not(.rs-hidden) + .rs-cube{opacity:1 !important;}#remotestorage-widget .rs-backends{position:relative;top:5px;right:0;}#remotestorage-widget .rs-cube{position:relative;top:5px;right:0;}/* pulsing animation for cube when loading */ #remotestorage-widget .rs-cube.remotestorage-loading{-webkit-animation:remotestorage-loading .5s ease-in-out infinite alternate;-moz-animation:remotestorage-loading .5s ease-in-out infinite alternate;-o-animation:remotestorage-loading .5s ease-in-out infinite alternate;-ms-animation:remotestorage-loading .5s ease-in-out infinite alternate;animation:remotestorage-loading .5s ease-in-out infinite alternate;}@-webkit-keyframes remotestorage-loading{to{opacity:.7}}@-moz-keyframes remotestorage-loading{to{opacity:.7}}@-o-keyframes remotestorage-loading{to{opacity:.7}}@-ms-keyframes remotestorage-loading{to{opacity:.7}}@keyframes remotestorage-loading{to{opacity:.7}}#remotestorage-widget a{text-decoration:underline;color:inherit;}#remotestorage-widget form{margin-top:.7em;position:relative;}#remotestorage-widget form input{display:table-cell;vertical-align:top;border:none;border-radius:6px;font-weight:bold;color:white;outline:none;line-height:1.5em;height:2em;}#remotestorage-widget form input:disabled{color:#999;background:#444 !important;cursor:default !important;}#remotestorage-widget form input[type=email]:focus, #remotestorage-widget form input[type=password]:focus{background:#223;}#remotestorage-widget form input[type=email], #remotestorage-widget form input[type=password]{background:#000;width:100%;height:26px;padding:0 30px 0 5px;border-top:1px solid #111;border-bottom:1px solid #999;}#remotestorage-widget form input[type=email]:focus, #remotestorage-widget form input[type=password]:focus{background:#223;}#remotestorage-widget button:focus, #remotestorage-widget input:focus{box-shadow:0 0 4px #ccc;}#remotestorage-widget form input[type=email]::-webkit-input-placeholder, #remotestorage-widget form input[type=password]::-webkit-input-placeholder{color:#999;}#remotestorage-widget form input[type=email]:-moz-placeholder, #remotestorage-widget form input[type=password]:-moz-placeholder{color:#999;}#remotestorage-widget form input[type=email]::-moz-placeholder, #remotestorage-widget form input[type=password]::-moz-placeholder{color:#999;}#remotestorage-widget form input[type=email]:-ms-input-placeholder, #remotestorage-widget form input[type=password]:-ms-input-placeholder{color:#999;}#remotestorage-widget form input[type=submit]{background:#000;cursor:pointer;padding:0 5px;}#remotestorage-widget form input[type=submit]:hover{background:#333;}#remotestorage-widget .rs-info-msg{font-size:10px;color:#eee;margin-top:0.7em;white-space:normal;}#remotestorage-widget .rs-info-msg.last-synced-message{display:inline;white-space:nowrap;margin-bottom:.7em}#remotestorage-widget .rs-info-msg a:hover, #remotestorage-widget .rs-info-msg a:active{color:#fff;}#remotestorage-widget button img{vertical-align:baseline;}#remotestorage-widget button{border:none;border-radius:6px;font-weight:bold;color:white;outline:none;line-height:1.5em;height:26px;width:26px;background:#000;cursor:pointer;margin:0;padding:5px;}#remotestorage-widget button:hover{background:#333;}#remotestorage-widget .rs-bubble button.connect, #remotestorage-widget .rs-bubble button.rs-cipher, #remotestorage-widget .rs-bubble button.rs-nocipher{display:block;background:none;position:absolute;right:0;top:0;opacity:1;/* increase clickable area of connect, rs-cipher & rs-nocipher buttons */ margin:-5px;padding:10px;width:36px;height:36px;}#remotestorage-widget .rs-bubble button.rs-cipher{width:46px;}#remotestorage-widget .rs-bubble button.rs-nocipher{height:26px;margin:0;padding:4px 5px 5px;right:-32px;width:26px;}#remotestorage-widget .rs-bubble button.connect:not([disabled]):hover, #remotestorage-widget .rs-bubble button.rs-cipher:not([disabled]):hover, #remotestorage-widget .rs-bubble button.rs-nocipher:not([disabled]):hover{background:rgba(150,150,150,.5);}#remotestorage-widget .rs-bubble button.connect[disabled], #remotestorage-widget .rs-bubble button.rs-cipher[disabled]{opacity:.5;cursor:default !important;}#remotestorage-widget .rs-bubble button.rs-sync{position:relative;left:-5px;bottom:-5px;padding:4px 4px 0 4px;background:#555;}#remotestorage-widget .rs-bubble button.rs-sync:hover{background:#444;}#remotestorage-widget .rs-bubble button.rs-disconnect{background:#721;position:absolute;right:0;bottom:0;padding:4px 4px 0 4px;}#remotestorage-widget .rs-bubble button.rs-disconnect:hover{background:#921;}#remotestorage-widget .remotestorage-error-info{color:#f92;}#remotestorage-widget .remotestorage-reset{width:100%;background:#721;}#remotestorage-widget .remotestorage-reset:hover{background:#921;}#remotestorage-widget .rs-bubble .rs-content{margin-top:7px;}#remotestorage-widget pre{user-select:initial;-webkit-user-select:initial;-moz-user-select:text;max-width:27em;margin-top:1em;overflow:auto;}#remotestorage-widget .rs-centered-text{text-align:center;}#remotestorage-widget .rs-bubble.rs-hidden{padding-bottom:2px;border-radius:5px 15px 15px 5px;}#remotestorage-widget .rs-error-msg{min-height:5em;}.rs-bubble.rs-hidden .rs-bubble-expandable{display:none;}.remotestorage-state-connected .rs-bubble.rs-hidden{display:none;}.remotestorage-connected{display:none;}.remotestorage-state-connected .remotestorage-connected{display:block;}.remotestorage-cipher-form{display:none;}.remotestorage-cipher .remotestorage-cipher-form{display:block;}.remotestorage-invalid-key{display:none;}.remotestorage-invalid-key.remotestorage-cipher-error{display:block;}.remotestorage-initial{display:none;}.remotestorage-state-initial .remotestorage-initial{display:block;}.remotestorage-error{display:none;}.remotestorage-state-error .remotestorage-error{display:block;}.remotestorage-state-authing .remotestorage-authing{display:block;}.remotestorage-state-offline .remotestorage-connected, .remotestorage-state-offline .remotestorage-offline{display:block;}.remotestorage-unauthorized{display:none;}.remotestorage-state-unauthorized .rs-bubble.rs-hidden{display:none;}.remotestorage-state-unauthorized .remotestorage-connected, .remotestorage-state-unauthorized .remotestorage-unauthorized{display:block;}.remotestorage-state-unauthorized .rs-sync{display:none;}.remotestorage-state-busy .rs-bubble.rs-hidden{display:none;}.remotestorage-state-busy .rs-bubble{display:block;}.remotestorage-state-busy .remotestorage-connected{display:block;}.remotestorage-state-authing .rs-bubble-expandable{display:none;}'
 };
 
 
@@ -6472,37 +6473,47 @@ RemoteStorage.Assets = {
 
 
 /** FILE: src/view.js **/
-(function(window) {
+(function (window){
 
   var t = RemoteStorage.I18n.translate;
 
   /**
    * Class: RemoteStorage.Widget.View
-   * 
+   *
    * Controls the visible widget
-   * 
+   *
    * States:
-   * 
-   * initial - not connected authing - in auth flow connected - connected to
-   * remote storage, not syncing at the moment ciphered - connected, with cipher
-   * notciphered - connected, without cipher busy - connected, syncing at the
-   * moment offline - connected, but no network connectivity error - connected,
-   * but sync error happened unauthorized - connected, but request returned 401
-   */
-  RemoteStorage.Widget.View = function(remoteStorage) {
+   *
+   *   initial      - not connected
+   *   authing      - in auth flow
+   *   connected    - connected to remote storage, not syncing at the moment
+   *   ciphered     - connected, with cipher
+   *   notciphered  - connected, without cipher
+   *   busy         - connected, syncing at the moment
+   *   offline      - connected, but no network connectivity
+   *   error        - connected, but sync error happened
+   *   unauthorized - connected, but request returned 401
+   **/
+  RemoteStorage.Widget.View = function (remoteStorage) {
     this.rs = remoteStorage;
-    if (typeof (document) === 'undefined') {
+    if (typeof(document) === 'undefined') {
       throw "Widget not supported";
     }
-    RemoteStorage.eventHandling(this, 'connect', 'secret-entered',
-        'secret-cancelled', 'disconnect', 'sync', 'display', 'reset');
+    RemoteStorage.eventHandling(this,
+                                'connect',
+                                'secret-entered',
+                                'secret-cancelled',
+                                'disconnect',
+                                'sync',
+                                'display',
+                                'reset');
 
     // Re-binding the event so they can be called from the window
-    for ( var event in this.events) {
+    for (var event in this.events){
       this.events[event] = this.events[event].bind(this);
     }
 
-    this.hideBubbleOnBodyClick = function(event) {
+    this.hideBubbleOnBodyClick = function (event) {
       for (var p = event.target; p !== document.body; p = p.parentElement) {
         if (p.id === 'remotestorage-widget') {
           return;
@@ -6514,37 +6525,32 @@ RemoteStorage.Assets = {
 
   RemoteStorage.Widget.View.prototype = {
 
-    connectGdrive : function() {
-      this._emit('connect', {
-        special : 'googledrive'
-      });
+    connectGdrive: function () {
+      this._emit('connect', { special: 'googledrive' });
     },
 
-    connectDropbox : function() {
-      this._emit('connect', {
-        special : 'dropbox'
-      });
+    connectDropbox: function (){
+      this._emit('connect', { special: 'dropbox'});
     },
 
-    connectSafeNetwork : function() {
-      this._emit('connect', {
-        special : 'safenetwork'
-      });
+    connectSafeNetwork: function (){
+      this._emit('connect', { special: 'safenetwork'});
     },
 
     /**
      * Method: setState
-     * 
+     *
      * Call the function that applies the state to the widget
-     * 
+     *
      * Parameters:
-     * 
-     * state args
-     */
-    setState : function(state, args) {
-      RemoteStorage.log('[View] widget.view.setState(', state, ',', args, ');');
+     *
+     *   state
+     *   args
+     **/
+    setState: function (state, args) {
+      RemoteStorage.log('[View] widget.view.setState(',state,',',args,');');
       var s = this.states[state];
-      if (typeof (s) === 'undefined') {
+      if (typeof(s) === 'undefined') {
         throw new Error("Bad State assigned to view: " + state);
       }
       s.apply(this, args);
@@ -6552,34 +6558,33 @@ RemoteStorage.Assets = {
 
     /**
      * Method: setUserAddress
-     * 
+     *
      * Set user address of the input field
-     */
-    setUserAddress : function(addr) {
+     **/
+    setUserAddress: function (addr) {
       this.userAddress = addr || '';
 
       var el;
-      if (this.div
-          && (el = this.div.querySelector('form.remotestorage-initial').userAddress)) {
+      if (this.div && (el = this.div.querySelector('form.remotestorage-initial').userAddress)) {
         el.value = this.userAddress;
       }
     },
 
     /**
      * Method: setUserSecretKey
-     * 
+     *
      * Set user secret key
-     */
-    setUserSecretKey : function(secretKey) {
+     **/
+    setUserSecretKey: function (secretKey) {
       this.userSecretKey = secretKey;
     },
 
     /**
-     * Method: toggleBubble
-     * 
-     * Show the bubble when hidden and the other way around
-     */
-    toggleBubble : function(event) {
+    * Method: toggleBubble
+    *
+    * Show the bubble when hidden and the other way around
+    **/
+    toggleBubble: function (event) {
       if (this.bubble.className.search('rs-hidden') < 0) {
         this.hideBubble(event);
       } else {
@@ -6589,73 +6594,63 @@ RemoteStorage.Assets = {
 
     /**
      * Method: hideBubble
-     * 
+     *
      * Hide the bubble
-     */
-    hideBubble : function() {
+     **/
+    hideBubble: function (){
       addClass(this.bubble, 'rs-hidden');
       document.body.removeEventListener('click', this.hideBubbleOnBodyClick);
     },
 
     /**
      * Method: showBubble
-     * 
+     *
      * Show the bubble
-     */
-    showBubble : function(event) {
+     **/
+    showBubble: function (event){
       removeClass(this.bubble, 'rs-hidden');
-      if (typeof (event) !== 'undefined') {
+      if (typeof(event) !== 'undefined') {
         stopPropagation(event);
       }
       document.body.addEventListener('click', this.hideBubbleOnBodyClick);
-      if (this.div.querySelector('.remotestorage-connected').classList
-          .contains('remotestorage-cipher')
-          && !this.userSecretKey) {
-        this.bubble.querySelector('form.remotestorage-cipher-form').userSecretKey
-            .focus();
+      if (this.div.querySelector('.remotestorage-connected').classList.contains('remotestorage-cipher') && !this.userSecretKey) {
+        this.bubble.querySelector('form.remotestorage-cipher-form').userSecretKey.focus();
       } else {
-        this.bubble.querySelector('form.remotestorage-initial').userAddress
-            .focus();
+        this.bubble.querySelector('form.remotestorage-initial').userAddress.focus();
       }
     },
 
     /**
      * Method: display
-     * 
+     *
      * Draw the widget inside of the dom element with the id options.domID
-     * 
+     *
      * Parameters:
-     * 
-     * options
-     * 
+     *
+     *   options
+     *
      * Returns:
-     * 
-     * The widget div
-     */
-    display : function(options) {
+     *
+     *   The widget div
+     **/
+    display: function (options) {
       if (typeof this.div !== 'undefined') {
         return this.div;
       }
 
       var element = document.createElement('div');
-      /*
-       * mrhTODO removewhenWidgetCssFile temporarily disable until widget allows CSS in external file
-       * var style = document.createElement('style'); style.innerHTML =
-       * RemoteStorage.Assets.widgetCss;
-       */
+      var style = document.createElement('style');
+      style.innerHTML = RemoteStorage.Assets.widgetCss;
+
       element.id = "remotestorage-widget";
 
       element.innerHTML = RemoteStorage.Assets.widget;
 
-      /*
-       * mrhTODO temporarily disable until widget allows CSS in external file
-       * element.appendChild(style);
-       */
+      element.appendChild(style);
       if (options.domID) {
         var parent = document.getElementById(options.domID);
-        if (!parent) {
-          throw "Failed to find target DOM element with id=\"" + options.domID
-              + "\"";
+        if (! parent) {
+          throw "Failed to find target DOM element with id=\"" + options.domID + "\"";
         }
         parent.appendChild(element);
       } else {
@@ -6666,15 +6661,13 @@ RemoteStorage.Assets = {
       setupButton(element, 'rs-sync', 'syncIcon', this.events.sync);
 
       // Disconnect button
-      setupButton(element, 'rs-disconnect', 'disconnectIcon',
-          this.events.disconnect);
+      setupButton(element, 'rs-disconnect', 'disconnectIcon', this.events.disconnect);
 
       // Get me out of here
       setupButton(element, 'remotestorage-reset', undefined, this.events.reset);
 
       // Connect button
-      var connectButton = setupButton(element, 'connect', 'connectIcon',
-          this.events.connect);
+      var connectButton = setupButton(element, 'connect', 'connectIcon', this.events.connect);
 
       // Handle connectButton state
       this.form = element.querySelector('form.remotestorage-initial');
@@ -6688,47 +6681,33 @@ RemoteStorage.Assets = {
       if (options.encryption) {
         this.cipher = true;
 
-        var secretKeyInput = element
-            .querySelector('form.remotestorage-cipher-form').userSecretKey;
+        var secretKeyInput = element.querySelector('form.remotestorage-cipher-form').userSecretKey;
 
-        // This is to avoid the 'password field on an insecured page' warning,
-        // when not used and on http (not https)
+        // This is to avoid the 'password field on an insecured page' warning, when not used and on http (not https)
         secretKeyInput.type = 'password';
 
         // Cipher button
-        var cipherButton = setupButton(element, 'rs-cipher', 'cipherIcon',
-            this.events['secret-entered']);
+        var cipherButton = setupButton(element, 'rs-cipher', 'cipherIcon', this.events['secret-entered']);
 
         // Handle cipherButton state
         secretKeyInput.addEventListener('load', handleButtonState);
         secretKeyInput.addEventListener('keyup', handleButtonState);
 
         // No cipher button
-        setupButton(element, 'rs-nocipher', 'nocipherIcon',
-            this.events['secret-cancelled']);
+        setupButton(element, 'rs-nocipher', 'nocipherIcon', this.events['secret-cancelled']);
       }
 
       // The cube
-      this.cube = setupButton(element, 'rs-cube', 'remoteStorageIcon',
-          this.toggleBubble.bind(this));
+      this.cube = setupButton(element, 'rs-cube', 'remoteStorageIcon', this.toggleBubble.bind(this));
 
-      // Google Drive and Dropbox icons
-      setupButton(element, 'rs-dropbox', 'dropbox', this.connectDropbox
-          .bind(this));
-      setupButton(element, 'rs-googledrive', 'googledrive', this.connectGdrive
-          .bind(this));
-      setupButton(element, 'rs-safenetwork', 'safenetwork', this.connectSafeNetwork
-          .bind(this));
+      // Google Drive, Dropbox and SafeNetwork icons
+      setupButton(element, 'rs-dropbox', 'dropbox', this.connectDropbox.bind(this));
+      setupButton(element, 'rs-googledrive', 'googledrive', this.connectGdrive.bind(this));
+      setupButton(element, 'rs-safenetwork', 'safenetwork', this.connectSafeNetwork.bind(this));
 
-      var bubbleDontCatch = {
-        INPUT : true,
-        BUTTON : true,
-        IMG : true
-      };
-      var eventListener = function(event) {
-        if (!bubbleDontCatch[event.target.tagName]
-            && !(this.div.classList
-                .contains('remotestorage-state-unauthorized'))) {
+      var bubbleDontCatch = { INPUT: true, BUTTON: true, IMG: true };
+      var eventListener = function (event) {
+        if (! bubbleDontCatch[event.target.tagName] && ! (this.div.classList.contains('remotestorage-state-unauthorized') )) {
           this.showBubble(event);
         }
       }.bind(this);
@@ -6743,31 +6722,24 @@ RemoteStorage.Assets = {
       return this.div;
     },
 
-    states : {
-      initial : function(message) {
+    states:  {
+      initial: function (message) {
         var cube = this.cube;
         var info = message || t("view_info");
 
-        // mrhTODO removewhenCSPdata ok. was:
-        // cube.src = RemoteStorage.Assets.remoteStorageIcon;
-        cube.src = './icons/remoteStorageIcon.png';
+        cube.src = RemoteStorage.Assets.remoteStorageIcon;
 
         this._renderTranslatedInitialContent();
 
         if (message) {
-          // mrhTODO removewhenCSPdata ok. was:
-          // cube.src = RemoteStorage.Assets.remoteStorageIconError;
-          cube.src = './icons/remoteStorageIconError.png';
+          cube.src = RemoteStorage.Assets.remoteStorageIconError;
           removeClass(this.cube, 'remotestorage-loading');
           this.showBubble();
 
-          // Show the red error cube for 5 seconds, then show the normal orange
-          // one again
-          setTimeout(function() {
-            // mrhTODO removewhenCSPdata ok. was:
-            // cube.src = RemoteStorage.Assets.remoteStorageIcon;
-            cube.src = './icons/remoteStorageIcon.png';
-          }, 2000);
+          // Show the red error cube for 5 seconds, then show the normal orange one again
+          setTimeout(function (){
+            cube.src = RemoteStorage.Assets.remoteStorageIcon;
+          },2000);
         } else {
           this.hideBubble();
         }
@@ -6777,19 +6749,12 @@ RemoteStorage.Assets = {
           delete this.userSecretKey;
         }
 
-        // Google Drive and Dropbox icons
+        // Google Drive, Dropbox and SafeNetwork icons
         var backends = 1;
-        if (this._activateBackend('dropbox')) {
-          backends += 1;
-        }
-        if (this._activateBackend('googledrive')) {
-          backends += 1;
-        }
-        if (this._activateBackend('safenetwork')) {
-          backends += 1;
-        }
-        this.div.querySelector('.rs-bubble-text').style.paddingRight = backends
-            * 32 + 8 + 'px';
+        if (this._activateBackend('dropbox')) { backends += 1; }
+        if (this._activateBackend('googledrive')) { backends += 1; }
+        if (this._activateBackend('safenetwork')) { backends += 1; }
+        this.div.querySelector('.rs-bubble-text').style.paddingRight = backends*32+8+'px';
 
         // If address not empty connect button enabled
         var cb = this.div.querySelector('.connect');
@@ -6807,166 +6772,137 @@ RemoteStorage.Assets = {
         }
       },
 
-      authing : function() {
+      authing: function () {
         this.div.removeEventListener('click', this.events.connect);
         this.div.className = "remotestorage-state-authing";
-        this.div.querySelector('.rs-status-text').innerHTML = t(
-            "view_connecting", this.userAddress);
+        this.div.querySelector('.rs-status-text').innerHTML = t("view_connecting", this.userAddress);
         addClass(this.cube, 'remotestorage-loading');
       },
 
-      connected : function() {
+      connected: function () {
         var cube = this.cube;
         this.div.className = "remotestorage-state-connected";
         this.div.querySelector('.userAddress').innerHTML = this.userAddress;
-        // mrhTODO removewhenCSPdata ok. was:
-        // cube.src = RemoteStorage.Assets.remoteStorageIcon;
-        cube.src = './icons/remoteStorageIcon.png';
+        cube.src = RemoteStorage.Assets.remoteStorageIcon;
         removeClass(cube, 'remotestorage-loading');
 
         if (this.cipher) {
           if (this.userSecretKey) {
             if (this.userSecretKeyError) {
-              // mrhTODO removewhenCSPdata ok. was:
-              // cube.src = RemoteStorage.Assets.remoteStorageIconError;
-              cube.src = './icons/remoteStorageIconError.png';
-              addClass(this.div.querySelector('.remotestorage-connected'),
-                  'remotestorage-cipher');
-              addClass(this.div.querySelector('.remotestorage-invalid-key'),
-                  'remotestorage-cipher-error');
+              cube.src = RemoteStorage.Assets.remoteStorageIconError;
+              addClass(this.div.querySelector('.remotestorage-connected'), 'remotestorage-cipher');
+              addClass(this.div.querySelector('.remotestorage-invalid-key'), 'remotestorage-cipher-error');
               this.showBubble();
 
-              // Show the red error cube for 5 seconds, then show the normal
-              // orange one again
-              setTimeout(function() {
-                // mrhTODO removewhenCSPdata ok. was:
-                // cube.src = RemoteStorage.Assets.remoteStorageIcon;
-                cube.src = './icons/remoteStorageIcon.png';
-              }, 5000);
+              // Show the red error cube for 5 seconds, then show the normal orange one again
+              setTimeout(function (){
+                cube.src = RemoteStorage.Assets.remoteStorageIcon;
+              },5000);
             } else {
-              removeClass(this.div.querySelector('.remotestorage-invalid-key'),
-                  'remotestorage-cipher-error');
-              // mrhTODO removewhenCSPdata ok. was:
-              // cube.src = RemoteStorage.Assets.remoteStorageIconCiphered;
-              cube.src = './icons/remoteStorageIconCiphered.png';
+              removeClass(this.div.querySelector('.remotestorage-invalid-key'), 'remotestorage-cipher-error');
+              cube.src = RemoteStorage.Assets.remoteStorageIconCiphered;
             }
           } else {
-            addClass(this.div.querySelector('.remotestorage-connected'),
-                'remotestorage-cipher');
+            addClass(this.div.querySelector('.remotestorage-connected'), 'remotestorage-cipher');
             this.showBubble();
           }
         }
 
         var icons = {
-          googledrive : this.div.querySelector('.rs-googledrive'),
-          dropbox : this.div.querySelector('.rs-dropbox'),
-          safenetwork : this.div.querySelector('.rs-safenetwork')
+          googledrive: this.div.querySelector('.rs-googledrive'),
+          dropbox: this.div.querySelector('.rs-dropbox'),
+          safenetwork: this.div.querySelector('.rs-safenetwork')
         };
-        icons.googledrive.style.display = icons.dropbox.style.display = icons.safenetwork.style.display = 'none';
+        icons.googledrive.style.display 
+          = icons.dropbox.style.display 
+          = icons.safenetwork.style.display 
+          = 'none';
         if (icons[this.rs.backend]) {
           icons[this.rs.backend].style.display = 'inline-block';
-          this.div.querySelector('.rs-bubble-text').style.paddingRight = 2 * 32 + 8 + 'px';
+          this.div.querySelector('.rs-bubble-text').style.paddingRight = 2*32+8+'px';
         } else {
-          this.div.querySelector('.rs-bubble-text').style.paddingRight = 32 + 8 + 'px';
+          this.div.querySelector('.rs-bubble-text').style.paddingRight = 32+8+'px';
         }
       },
 
-      ciphered : function() {
+      ciphered: function () {
         this.div.querySelector('form.remotestorage-cipher-form').userSecretKey.value = '';
-        removeClass(this.div.querySelector('.remotestorage-invalid-key'),
-            'remotestorage-cipher-error');
-        removeClass(this.div.querySelector('.remotestorage-connected'),
-            'remotestorage-cipher');
-        // mrhTODO removewhenCSPdata ok. was:
-        // this.cube.src = RemoteStorage.Assets.remoteStorageIconCiphered;
-        this.cube.src = './icons/remoteStorageIconCiphered.png';
+        removeClass(this.div.querySelector('.remotestorage-invalid-key'), 'remotestorage-cipher-error');
+        removeClass(this.div.querySelector('.remotestorage-connected'), 'remotestorage-cipher');
+        this.cube.src = RemoteStorage.Assets.remoteStorageIconCiphered;
         this.hideBubble();
       },
 
-      notciphered : function() {
+      notciphered: function () {
         this.cipher = false;
-        removeClass(this.div.querySelector('.remotestorage-invalid-key'),
-            'remotestorage-cipher-error');
-        removeClass(this.div.querySelector('.remotestorage-connected'),
-            'remotestorage-cipher');
+        removeClass(this.div.querySelector('.remotestorage-invalid-key'), 'remotestorage-cipher-error');
+        removeClass(this.div.querySelector('.remotestorage-connected'), 'remotestorage-cipher');
         this.hideBubble();
       },
 
-      busy : function() {
+      busy: function () {
         this.div.className = "remotestorage-state-busy";
-        addClass(this.cube, 'remotestorage-loading'); // TODO needs to be undone
-                                                      // when is that neccesary
+        addClass(this.cube, 'remotestorage-loading'); //TODO needs to be undone when is that neccesary
       },
 
-      offline : function() {
+      offline: function () {
         this.div.className = "remotestorage-state-offline";
-        // mrhTODO removewhenCSPdata ok. was:
-        // this.cube.src = RemoteStorage.Assets.remoteStorageIconOffline;
-        this.cube.src = './icons/remoteStorageIconOffline.png';
+        this.cube.src = RemoteStorage.Assets.remoteStorageIconOffline;
         this.div.querySelector('.rs-status-text').innerHTML = t("view_offline");
       },
 
-      error : function(err) {
+      error: function (err) {
         var errorMsg = err;
         this.div.className = "remotestorage-state-error";
 
-        this.div.querySelector('.rs-bubble-text').innerHTML = '<strong>'
-            + t('view_error_occured') + '</strong>';
-        // FIXME I don't know what an DOMError is and my browser doesn't know
-        // too(how to handle this?)
-        if (err instanceof Error /* || err instanceof DOMError */) {
-          errorMsg = err.message + '\n\n' + err.stack;
+        this.div.querySelector('.rs-bubble-text').innerHTML = '<strong>'+t('view_error_occured')+'</strong>';
+        //FIXME I don't know what an DOMError is and my browser doesn't know too(how to handle this?)
+        if (err instanceof Error /*|| err instanceof DOMError*/) {
+          errorMsg = err.message + '\n\n' +
+            err.stack;
         }
         this.div.querySelector('.rs-error-msg').textContent = errorMsg;
-        // mrhTODO removewhenCSPdata ok. was:
-        //this.cube.src = RemoteStorage.Assets.remoteStorageIconError;
-        this.cube.src = './icons/remoteStorageIconError.png';
+        this.cube.src = RemoteStorage.Assets.remoteStorageIconError;
         this.showBubble();
       },
 
-      unauthorized : function() {
+      unauthorized: function () {
         this.div.className = "remotestorage-state-unauthorized";
-        // mrhTODO removewhenCSPdata ok. was:
-        //this.cube.src = RemoteStorage.Assets.remoteStorageIconError;
-        this.cube.src = './icons/remoteStorageIconError.png';
+        this.cube.src = RemoteStorage.Assets.remoteStorageIconError;
         this.showBubble();
         this.div.addEventListener('click', this.events.connect);
       }
     },
 
-    events : {
-      /**
-       * Event: connect
-       * 
-       * Emitted when the connect button is clicked
-       */
-      connect : function(event) {
+    events: {
+    /**
+     * Event: connect
+     *
+     * Emitted when the connect button is clicked
+     **/
+      connect: function (event) {
         stopPropagation(event);
         event.preventDefault();
-        this._emit('connect', this.div
-            .querySelector('form.remotestorage-initial').userAddress.value);
+        this._emit('connect', this.div.querySelector('form.remotestorage-initial').userAddress.value);
       },
 
-      /**
-       * Event: secret-entered
-       * 
-       * Emitted when the cipher button is clicked
-       */
-      'secret-entered' : function(event) {
+    /**
+     * Event: secret-entered
+     *
+     * Emitted when the cipher button is clicked
+     **/
+      'secret-entered': function (event) {
         stopPropagation(event);
         event.preventDefault();
-        this
-            ._emit(
-                'secret-entered',
-                this.div.querySelector('form.remotestorage-cipher-form').userSecretKey.value);
+        this._emit('secret-entered', this.div.querySelector('form.remotestorage-cipher-form').userSecretKey.value);
       },
 
-      /**
-       * Event: secret-cancelled
-       * 
-       * Emitted when the nocipher button is clicked
-       */
-      'secret-cancelled' : function(event) {
+    /**
+     * Event: secret-cancelled
+     *
+     * Emitted when the nocipher button is clicked
+     **/
+      'secret-cancelled': function (event) {
         stopPropagation(event);
         event.preventDefault();
         this._emit('secret-cancelled');
@@ -6974,10 +6910,10 @@ RemoteStorage.Assets = {
 
       /**
        * Event: sync
-       * 
+       *
        * Emitted when the sync button is clicked
-       */
-      sync : function(event) {
+       **/
+      sync: function (event) {
         stopPropagation(event);
         event.preventDefault();
 
@@ -6986,10 +6922,10 @@ RemoteStorage.Assets = {
 
       /**
        * Event: disconnect
-       * 
+       *
        * Emitted when the disconnect button is clicked
-       */
-      disconnect : function(event) {
+       **/
+      disconnect: function (event) {
         stopPropagation(event);
         event.preventDefault();
         this._emit('disconnect');
@@ -6997,23 +6933,23 @@ RemoteStorage.Assets = {
 
       /**
        * Event: reset
-       * 
+       *
        * Emitted after crash triggers disconnect
-       */
-      reset : function(event) {
+       **/
+      reset: function (event){
         event.preventDefault();
         var result = window.confirm(t('view_confirm_reset'));
-        if (result) {
+        if (result){
           this._emit('reset');
         }
       },
 
       /**
        * Event: display
-       * 
+       *
        * Emitted when finished displaying the widget
-       */
-      display : function(event) {
+       **/
+      display : function (event) {
         if (event) {
           event.preventDefault();
         }
@@ -7021,7 +6957,7 @@ RemoteStorage.Assets = {
       }
     },
 
-    _renderTranslatedInitialContent : function() {
+    _renderTranslatedInitialContent: function () {
       this.div.querySelector('.rs-status-text').innerHTML = t("view_connect");
       this.div.querySelector('.remotestorage-reset').innerHTML = t("view_get_me_out");
       this.div.querySelector('.rs-error-plz-report').innerHTML = t("view_error_plz_report");
@@ -7029,7 +6965,7 @@ RemoteStorage.Assets = {
       this.div.querySelector('.remotestorage-invalid-key').innerHTML = t("view_invalid_key");
     },
 
-    _activateBackend : function activateBackend(backendName) {
+    _activateBackend: function activateBackend(backendName) {
       var className = 'rs-' + backendName;
       if (this.rs.apiKeys[backendName]) {
         this.div.querySelector('.' + className).style.display = 'inline-block';
@@ -7050,7 +6986,7 @@ RemoteStorage.Assets = {
   }
 
   function stopPropagation(event) {
-    if (typeof (event.stopPropagation) === 'function') {
+    if (typeof(event.stopPropagation) === 'function') {
       event.stopPropagation();
     } else {
       event.cancelBubble = true;
@@ -7061,12 +6997,7 @@ RemoteStorage.Assets = {
     var element = parent.querySelector('.' + className);
     if (typeof iconName !== 'undefined') {
       var img = element.querySelector('img');
-      /*
-       * mrhTODO removewhenCSPdata - temporarily disable until widget allows CSS in external file
-       * (img || element).src = RemoteStorage.Assets[iconName]; Instead do:
-       */
-      (img || element).src = './icons/' + iconName + '.png';
-
+      (img || element).src = RemoteStorage.Assets[iconName];
     }
     element.addEventListener('click', eventListener);
     return element;
@@ -7076,10 +7007,10 @@ RemoteStorage.Assets = {
     if (event.target.value) {
       event.target.nextElementSibling.removeAttribute('disabled');
     } else {
-      event.target.nextElementSibling.setAttribute('disabled', 'disabled');
+      event.target.nextElementSibling.setAttribute('disabled','disabled');
     }
   }
-})(typeof (window) !== 'undefined' ? window : global);
+})(typeof(window) !== 'undefined' ? window : global);
 
 
 /** FILE: node_modules/tv4/tv4.js **/
