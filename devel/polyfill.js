@@ -57,7 +57,7 @@
 	}
 
 	if (!window.safeNFS) {
-	    window.safeDNS = safejs.nfs;
+	    window.safeNFS = safejs.nfs;
 	}
 
 	if (!window.safeDNS) {
@@ -7397,7 +7397,7 @@
 	    };
 
 	    return (0, _isomorphicFetch2.default)(url, payload).then(function (response) {
-	        return response;
+          return (0, _utils.parseResponse)(response);
 	    });
 	};
 

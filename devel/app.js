@@ -34,20 +34,23 @@
                                                // holds permissions granted by user
 			},
 		}
-    ); 
+    );
+ 
 //remoteStorage.disconnect();//mrhTODO disconnect() to start with a clean slate every time
 
     // Googledrive option
-    /*
-remoteStorage.setApiKeys('googledrive', {
+/*    remoteStorage.setApiKeys('googledrive', {
        clientId: '857377956471-0qma3pqj34k7sio6d17bhnu3rvjqu57e.apps.googleusercontent.com'
     });
-    */
-    
+*/    
     remoteStorage.displayWidget();
     remoteStorage.myfavoritedrinks.init();
     remoteStorage.myfavoritedrinks.on('change', function(event) {
       console.log('change from '+event.origin, event);
+      if (event.oldValue && event.newValue || !event.oldValue && !event.newValue) {
+        console.log('App Error: change event has no change (old: ' + event.oldValue + ' new: ' + event.newValue + ')' );
+      }
+
       // add
       if(event.newValue && (! event.oldValue)) {
         displayDrink(event.relativePath, event.newValue.name);
