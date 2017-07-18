@@ -23,20 +23,22 @@
     // SAFE Network backend requires application identity and required permissions rather than
     // API keys (authentication is handled by the user via SAFE Launcher, not a server)
     remoteStorage.setApiKeys('safenetwork', 
-		{	
+        {   
             // For details see SAFE Launcher /auth JSON API
-			app: {
-			    name: 'RemoteStorage Demo',		// Your app name etc.
-			    version: '0.0.1',
-			    vendor: 'remoteStorage',
-			    id: 'org.remotestorage.rsdemo',      // Identifies stored data (unique per vendor)
-	        permissions: ['SAFE_DRIVE_ACCESS']   // List of permissions to request. On authorisation, 
+            app: {
+                name: 'My Favorite Drinks (RS.js demo)',        // Your app name etc.
+                version: '0.0.1',
+                vendor: 'remoteStorage',
+                id: 'org.remotestorage.rsdemo',      // Identifies stored data (unique per vendor)
+            permissions: ['SAFE_DRIVE_ACCESS']   // List of permissions to request. On authorisation, 
                                                // holds permissions granted by user
-			},
-		}
-    ); 
-//remoteStorage.disconnect();//mrhTODO disconnect() to start with a clean slate every time
-
+            },
+            // mrhTODO: clientId not used on SAFEnetwork - any equivalent?
+            //   purpose of clientId is to show the app is allowed to access user data
+            clientId: 'placeholder'
+        }
+    );
+    
     // Googledrive option
     /*
 remoteStorage.setApiKeys('googledrive', {

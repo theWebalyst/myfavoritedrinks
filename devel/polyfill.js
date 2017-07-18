@@ -156,7 +156,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.setUserLongName = exports.setAuthToken = exports.isTokenValid = exports.getUserLongName = exports.getAuthToken = exports.authorise = exports.manifest = undefined;
+	exports.isTokenValid = exports.authorise = exports.manifest = undefined;
 
 	var _isomorphicFetch = __webpack_require__(3);
 
@@ -172,145 +172,18 @@
 
 	var dnsList = null;
 
-	var localStorageExists = typeof localStorage === 'undefined' ? false : true;
-
-	var tokenStore = {};
-	// localStorage shim for node
-	if (!localStorageExists) {
-	    var localStorage = {
-	        getItem: function getItem(item) {
-	            return this[item];
-	        },
-	        setItem: function setItem(key, item) {
-	            this[key] = item;
-	        },
-	        clear: function clear() {
-	            return true;
-	        }
-	    };
-	}
-
 	/*
 	* Manifest for Beaker: 
 	* https://github.com/pfrazee/beaker/blob/master/doc/authoring-plugins.md#api-manifests
 	*/
 	var manifest = exports.manifest = {
-	    getAuthToken: 'sync',
-	    getUserLongName: 'sync',
-	    setAuthToken: 'sync',
-	    setUserLongName: 'sync',
-	    sendAuthorisationRequest: 'promise',
 	    isTokenValid: 'promise',
 	    authorise: 'promise'
 	};
 
-	/**
-	 * authorise the application on the SAFE Network
-	 * @param  { object }  packageData      safeAuth object 
-	 *                                      {
-	                                         name: '',
-	                                         id: '',
-	                                         version: '',
-	                                         vendor: ''
-	                                        }
-	 * @param  { string }  [tokenKey=TOKEN_KEY] key to save token as in localStorage (in a browser)
-	 * @param  {Boolean} isTokenValid         [OPTIONAL] Token validator function
-	 * @return {[type]}                       [description]
-	 *
-	 * TODO: Remove token check here, this should essentially just be the same as
-	 * sendAuthRequest
-	 */
-	var authorise = exports.authorise = function authorise(packageData, token) {
-	    var tokenString = token;
-
-	    // for beaker only. Otherwise use localStorage.
-	    if (!localStorageExists && this && this.sender) {
-	        // get the webcontents url
-	        var wholeUrl = this.sender.getURL();
-	        var parsedUrl = _url2.default.parse(wholeUrl);
-	        tokenString = parsedUrl.hostname;
-
-	        //override vendor with the url?
-	        if (packageData) packageData.vendor = wholeUrl;
-	    }
-
-	    var tokenFromStorage = getAuthToken(tokenString);
-
-	    return isTokenValid(tokenFromStorage).then(function (response) {
-	        if (response) {
-	            return Promise.resolve({
-	                token: token,
-	                checkedOut: true
-	            });
-	        }
-
-	        if (!response) {
-	            localStorage.clear();
-	            //should return token
-	            return sendAuthorisationRequest(packageData, tokenString);
-	        }
-	    });
-	};
-
-	var getAuthToken = exports.getAuthToken = function getAuthToken(tokenKey) {
-	    if (!tokenKey) {
-	        return Promise.reject('tokenKey is missing.');
-	    }
-
-	    return localStorage.getItem(tokenKey);
-	};
-
-	var getUserLongName = exports.getUserLongName = function getUserLongName(longNameKey, localStorage) {
-	    return localStorage.getItem(longNameKey);
-	};
-
-	/**
-	 * Check if a token is valid with the current launcher
-	 * @param  {string}  token auth token for SAFE
-	 * @return {Boolean}      is the token valid?
-	 */
-	var isTokenValid = exports.isTokenValid = function isTokenValid(token) {
-
-	    var url = _utils.SERVER + 'auth';
-	    var payload = {
-	        method: 'GET',
-	        headers: {
-	            Authorization: 'Bearer ' + token
-	        }
-	    };
-
-	    return (0, _isomorphicFetch2.default)(url, payload).then(function (response) {
-	        if (response.status === 200 && response.ok) {
-	            return Promise.resolve(true);
-	        } else {
-	            return Promise.resolve(false);
-	        }
-	    });
-	};
-
-	var setAuthToken = exports.setAuthToken = function setAuthToken(tokenKey, token) {
-	    if (!tokenKey) {
-	        return Promise.reject('tokenKey is missing.');
-	    }
-
-	    if (!token) {
-	        return Promise.reject('token is missing.');
-	    }
-
-	    localStorage.setItem(tokenKey, token);
-	};
-
-	var setUserLongName = exports.setUserLongName = function setUserLongName(longNameKey, longName) {
-	    localStorage.setItem(longNameKey, longName);
-	};
-
-	var sendAuthorisationRequest = function sendAuthorisationRequest(packageData, tokenKey) {
+	var authorise = exports.authorise = function authorise(packageData) {
 	    if (!packageData) {
 	        return Promise.reject('packageData is missing.');
-	    }
-
-	    if (!tokenKey) {
-	        return Promise.reject('tokenKey is missing.');
 	    }
 
 	    var url = _utils.SERVER + 'auth';
@@ -335,10 +208,30 @@
 
 	    return (0, _isomorphicFetch2.default)(url, payload).then(function (response) {
 	        return (0, _utils.parseResponse)(response);
-	    }).then(function (parsedResponse) {
-	        setAuthToken(tokenKey, parsedResponse.token);
+	    });
+	};
 
-	        return parsedResponse;
+	/**
+	 * Check if a token is valid with the current launcher
+	 * @param  {string}  token auth token for SAFE
+	 * @return {Boolean}      is the token valid?
+	 */
+	var isTokenValid = exports.isTokenValid = function isTokenValid(token) {
+
+	    var url = _utils.SERVER + 'auth';
+	    var payload = {
+	        method: 'GET',
+	        headers: {
+	            Authorization: 'Bearer ' + token
+	        }
+	    };
+
+	    return (0, _isomorphicFetch2.default)(url, payload).then(function (response) {
+	        if (response.status === 200 && response.ok) {
+	            return Promise.resolve(true);
+	        } else {
+	            return Promise.resolve(false);
+	        }
 	    });
 	};
 
@@ -2242,12 +2135,12 @@
 
 	var failParsing = function failParsing(response) {
 	    //handle unauthorised requests
-	    if (response.status === 401) {
-	        return Promise.reject(response.statusText);
+	    if (response.status === 401 || response.status === 404) {
+	        return Promise.reject(response);
 	    }
 
 	    return response.clone().json().then(function (json) {
-	        return Promise.reject(json);
+	        return Promise.reject(new Error(json));
 	    });
 	};
 
@@ -7255,7 +7148,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.renameFile = exports.renameDir = exports.rename = exports.moveFile = exports.moveDir = exports.getFile = exports.getDir = exports.deleteFile = exports.deleteDir = exports.createFile = exports.createDir = exports.manifest = undefined;
+	exports.renameFile = exports.renameDir = exports.rename = exports.moveFile = exports.moveDir = exports.getFileMetadata = exports.getFile = exports.getDir = exports.deleteFile = exports.deleteDir = exports.createOrUpdateFile = exports.createFile = exports.createDir = exports.manifest = undefined;
 
 	var _isomorphicFetch = __webpack_require__(3);
 
@@ -7272,10 +7165,12 @@
 	var manifest = exports.manifest = {
 	    createDir: 'promise',
 	    createFile: 'promise',
+	    createOrUpdateFile: 'promise',
 	    deleteDir: 'promise',
 	    deleteFile: 'promise',
 	    getDir: 'promise',
 	    getFile: 'promise',
+	    getFileMetadata: 'promise',
 	    moveFile: 'promise',
 	    moveDir: 'promise',
 	    // modifyFileContent       : 'promise',
@@ -7336,6 +7231,28 @@
 	    });
 	};
 
+	var createOrUpdateFile = exports.createOrUpdateFile = function createOrUpdateFile(token, filePath, dataToWrite) {
+	    var dataType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'text/plain';
+	    var dataLength = arguments[4];
+	    var metadata = arguments[5];
+	    var isPathShared = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+
+	    return getFileMetadata(token, filePath, isPathShared).then(function (headers) {
+	        return deleteFile(token, filePath, isPathShared).then(function (success) {
+	            if (success) {
+	                return createFile(token, filePath, dataToWrite, dataType, dataLength, metadata, isPathShared);
+	            }
+	        });
+	    }).catch(function (response) {
+	        //file doesnt exist 
+	        if (response.status === 404) {
+	            return createFile(token, filePath, dataToWrite, dataType, dataLength, metadata, isPathShared);
+	        } else {
+	            return Promise.reject((0, _utils.parseResponse)(response));
+	        }
+	    });
+	};
+
 	var deleteDir = exports.deleteDir = function deleteDir(token, dirPath) {
 	    var isPathShared = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
@@ -7385,8 +7302,15 @@
 	    });
 	};
 
+	var validResponseParsing = ['buffer', 'blob', 'json', 'text'];
 	var getFile = exports.getFile = function getFile(token, filePath) {
-	    var isPathShared = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+	    var responseParsing = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'text';
+	    var isPathShared = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+
+	    if (!validResponseParsing.includes(responseParsing)) {
+	        return Promise.reject(new Error('invalid response parsing method, should be one of: ' + validResponseParsing.join()));
+	    }
 
 	    var rootPath = isPathShared ? _utils.ROOT_PATH.DRIVE : _utils.ROOT_PATH.APP;
 	    var url = _utils.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
@@ -7397,7 +7321,37 @@
 	    };
 
 	    return (0, _isomorphicFetch2.default)(url, payload).then(function (response) {
-          return (0, _utils.parseResponse)(response);
+
+	        if (!response.ok) {
+	            return (0, _utils.parseResponse)(response);
+	        }
+
+	        if (!responseParsing) {
+	            return response;
+	        } else {
+	            return response[responseParsing]();
+	        }
+	    });
+	};
+
+	var getFileMetadata = exports.getFileMetadata = function getFileMetadata(token, filePath) {
+	    var isPathShared = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+	    var rootPath = isPathShared ? _utils.ROOT_PATH.DRIVE : _utils.ROOT_PATH.APP;
+	    var url = _utils.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
+	    var payload = {
+	        method: 'HEAD',
+	        headers: {
+	            'Authorization': 'Bearer ' + token
+	        }
+	    };
+
+	    return (0, _isomorphicFetch2.default)(url, payload).then(function (response) {
+	        if (response.status === 200) {
+	            return response.headers;
+	        } else {
+	            return Promise.reject(response);
+	        }
 	    });
 	};
 

@@ -26,23 +26,26 @@
 		{	
             // For details see SAFE Launcher /auth JSON API
 			app: {
-			    name: 'RemoteStorage Demo',		// Your app name etc.
+			    name: 'My Favorite Drinks (RS.js demo)',		// Your app name etc.
 			    version: '0.0.1',
 			    vendor: 'remoteStorage',
 			    id: 'org.remotestorage.rsdemo',      // Identifies stored data (unique per vendor)
 	        permissions: ['SAFE_DRIVE_ACCESS']   // List of permissions to request. On authorisation, 
                                                // holds permissions granted by user
 			},
+            // mrhTODO: clientId not used on SAFEnetwork - any equivalent?
+            //   purpose of clientId is to show the app is allowed to access user data
+			clientId: 'placeholder'
 		}
     );
  
 //remoteStorage.disconnect();//mrhTODO disconnect() to start with a clean slate every time
 
-    // Googledrive option
-/*    remoteStorage.setApiKeys('googledrive', {
+    // Googledrive option (only last call to setApiKeys() works properly)
+    remoteStorage.setApiKeys('googledrive', {
        clientId: '857377956471-0qma3pqj34k7sio6d17bhnu3rvjqu57e.apps.googleusercontent.com'
     });
-*/    
+    
     remoteStorage.displayWidget();
     remoteStorage.myfavoritedrinks.init();
     remoteStorage.myfavoritedrinks.on('change', function(event) {

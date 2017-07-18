@@ -1,4 +1,4 @@
-/** remotestorage.js 0.13.0, http://remotestorage.io, MIT-licensed **/
+/** remotestorage.js 0.14.0, http://remotestorage.io, MIT-licensed **/
 
 /** FILE: lib/bluebird.js **/
 /**
@@ -3441,6 +3441,18 @@ module.exports = ret;
      *
      * Fired when a wire request completes
      **/
+    /**
+     * Event: network-offline
+     *
+     * Fired once when a wire request fails for the first time, and
+     * `remote.online` is set to false
+     **/
+    /**
+     * Event: network-online
+     *
+     * Fired once when a wire request succeeds for the first time after a
+     * failed one, and `remote.online` is set back to true
+     **/
 
     // Initial configuration property settings.
     if (typeof cfg === 'object') {
@@ -3450,8 +3462,9 @@ module.exports = ret;
 
     RemoteStorage.eventHandling(
       this, 'ready', 'connected', 'disconnected', 'not-connected', 'conflict',
-            'error', 'features-loaded', 'connecting', 'authing', 'wire-busy',
-            'wire-done', 'sync-interval-change'
+            'error', 'features-loaded', 'connecting', 'authing',
+            'sync-interval-change', 'wire-busy', 'wire-done',
+            'network-offline', 'network-online'
     );
 
     // pending get/put/delete calls.
@@ -3587,6 +3600,20 @@ module.exports = ret;
      */
 
     /**
+     * Method: startSync
+     *
+     * Start synchronization with remote storage, downloading and uploading any
+     * changes within the cached paths.
+     *
+     * Please consider: local changes will attempt sync immediately, and remote
+     * changes should also be synced timely when using library defaults. So
+     * this is mostly useful for letting users sync manually, when pressing a
+     * sync button for example. This might feel safer to them sometimes, esp.
+     * when shifting between offline and online a lot.
+     */
+     // (see src/sync.js for implementation)
+
+    /**
      * Method: connect
      *
      * Connect to a remoteStorage server.
@@ -3638,7 +3665,7 @@ module.exports = ret;
       this._emit('connecting');
 
       var discoveryTimeout = setTimeout(function () {
-        this._emit('error', new RemoteStorage.DiscoveryError("No storage information found at that user address."));
+        this._emit('error', new RemoteStorage.DiscoveryError("No storage information found for this user address."));
       }.bind(this), RemoteStorage.config.discoveryTimeout);
 
       RemoteStorage.Discover(userAddress).then(function (info) {
@@ -3670,7 +3697,8 @@ module.exports = ret;
           }
         }
       }.bind(this), function(err) {
-        this._emit('error', new RemoteStorage.DiscoveryError("Failed to contact storage server."));
+        clearTimeout(discoveryTimeout);
+        this._emit('error', new RemoteStorage.DiscoveryError("No storage information found for this user address."));
       }.bind(this));
     },
 
@@ -3786,6 +3814,8 @@ module.exports = ret;
      *
      * Set API keys for (currently) GoogleDrive, Dropbox and SAFE Network backend 
      * support.
+     * 
+     * mrhTODO the following is changing needs updating once new scheme clear
      * 
      * Note that SafeNetwork (SAFE Network) backend does not require an API key from
      * an authority as in the case of most cloud services, so setApiKeys() is
@@ -4907,6 +4937,7 @@ module.exports = ret;
    * Class : RemoteStorage.WireClient
    **/
   RS.WireClient = function (rs) {
+    this.rs = rs;
     this.connected = false;
 
     /**
@@ -4918,7 +4949,8 @@ module.exports = ret;
      *   Fired when the wireclient connect method realizes that it is in
      *   possession of a token and href
      **/
-    RS.eventHandling(this, 'change', 'connected', 'wire-busy', 'wire-done', 'not-connected');
+    RS.eventHandling(this, 'change', 'connected', 'not-connected',
+                           'wire-busy', 'wire-done');
 
     onErrorCb = function (error){
       if (error instanceof RemoteStorage.Unauthorized) {
@@ -5004,13 +5036,17 @@ module.exports = ret;
         body: body,
         headers: headers,
         responseType: 'arraybuffer'
-      }).then(function (response) {
+      }).then(function(response) {
+        if (!self.online) {
+          self.online = true;
+          self.rs._emit('network-online');
+        }
         self._emit('wire-done', {
           method: method,
           isFolder: isFolder(uri),
           success: true
         });
-        self.online = true;
+
         if (isErrorStatus(response.status)) {
           RemoteStorage.log('[WireClient] Error response status', response.status);
           if (getEtag) {
@@ -5046,11 +5082,16 @@ module.exports = ret;
           }
         }
       }, function (error) {
+        if (self.online) {
+          self.online = false;
+          self.rs._emit('network-offline');
+        }
         self._emit('wire-done', {
           method: method,
           isFolder: isFolder(uri),
           success: false
         });
+
         return Promise.reject(error);
       });
     },
@@ -5351,7 +5392,7 @@ module.exports = ret;
 
     webFinger.lookup(userAddress, function (err, response) {
       if (err) {
-        return pending.reject(err.message);
+        return pending.reject(err);
       } else if ((typeof response.idx.links.remotestorage !== 'object') ||
                  (typeof response.idx.links.remotestorage.length !== 'number') ||
                  (response.idx.links.remotestorage.length <= 0)) {
@@ -5407,11 +5448,11 @@ module.exports = ret;
 /* global define */
 /*!
  * webfinger.js
- *   version 2.3.2
+ *   version 2.6.0
  *   http://github.com/silverbucket/webfinger.js
  *
  * Developed and Maintained by:
- *   Nick Jennings <nick@silverbucket.net> 2012 - 2014
+ *   Nick Jennings <nick@silverbucket.net> 2012 - 2016
  *
  * webfinger.js is released under the AGPL (see LICENSE).
  *
@@ -5427,7 +5468,7 @@ if (typeof XMLHttpRequest === 'undefined') {
   XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 }
 
-(function (undefined) {
+(function (global) {
 
   // URI to property name map
   var LINK_URI_MAPS = {
@@ -5468,7 +5509,7 @@ if (typeof XMLHttpRequest === 'undefined') {
     return obj;
   }
 
-  // given a URL ensures it's HTTPS. 
+  // given a URL ensures it's HTTPS.
   // returns false for null string or non-HTTPS URL.
   function isSecure(url) {
     if (typeof url !== 'string') {
@@ -5505,56 +5546,74 @@ if (typeof XMLHttpRequest === 'undefined') {
 
   // make an http request and look for JRD response, fails if request fails
   // or response not json.
-  WebFinger.prototype.__fetchJRD = function (_url, errorHandler, sucessHandler) {
+  WebFinger.prototype.__fetchJRD = function (url, errorHandler, sucessHandler) {
     var self = this;
-    function __makeRequest(url) {
-      var xhr = new XMLHttpRequest();
-  
+
+    var xhr = new XMLHttpRequest();
+    xhr.timeout = this.config.request_timeout;
+
+    function __processState() {
+      if (xhr.status === 200) {
+        if (self.__isValidJSON(xhr.responseText)) {
+          return sucessHandler(xhr.responseText);
+        } else {
+          return errorHandler(generateErrorObject({
+            message: 'invalid json',
+            url: url,
+            status: xhr.status
+          }));
+        }
+      } else if (xhr.status === 404) {
+        return errorHandler(generateErrorObject({
+          message: 'resource not found',
+          url: url,
+          status: xhr.status
+        }));
+      } else if ((xhr.status >= 301) && (xhr.status <= 302)) {
+        var location = xhr.getResponseHeader('Location');
+        if (isSecure(location)) {
+          return __makeRequest(location); // follow redirect
+        } else {
+          return errorHandler(generateErrorObject({
+            message: 'no redirect URL found',
+            url: url,
+            status: xhr.status
+          }));
+        }
+      } else {
+        return errorHandler(generateErrorObject({
+          message: 'error during request',
+          url: url,
+          status: xhr.status
+        }));
+      }
+    }
+
+    function __makeRequest() {
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            if (self.__isValidJSON(xhr.responseText)) {
-              return sucessHandler(xhr.responseText);
-            } else {
-              return errorHandler(generateErrorObject({
-                message: 'invalid json',
-                url: url,
-                status: xhr.status
-              }));
-            }
-          } else if (xhr.status === 404) {
-            return errorHandler(generateErrorObject({
-              message: 'endpoint unreachable',
-              url: url,
-              status: xhr.status
-            }));
-          } else if ((xhr.status >= 301) && (xhr.status <= 302)) {
-            var location = xhr.getResponseHeader('Location');
-            if (isSecure(location)) {
-              return __makeRequest(location); // follow redirect
-            } else {
-              return errorHandler(generateErrorObject({
-                message: 'no redirect URL found',
-                url: url,
-                status: xhr.status
-              }));
-            }
-          } else {
-            return errorHandler(generateErrorObject({
-              message: 'error during request',
-              url: url,
-              status: xhr.status
-            }));
-          }
+          __processState();
         }
       };
-  
+
+      xhr.onload = function () {
+        __processState();
+      };
+
+      xhr.ontimeout = function () {
+        return errorHandler(generateErrorObject({
+          message: 'request timed out',
+          url: url,
+          status: xhr.status
+        }));
+      };
+
       xhr.open('GET', url, true);
       xhr.setRequestHeader('Accept', 'application/jrd+json, application/json');
       xhr.send();
     }
-    
-    return __makeRequest(_url);
+
+    return __makeRequest();
   };
 
   WebFinger.prototype.__isValidJSON = function (str) {
@@ -5573,16 +5632,15 @@ if (typeof XMLHttpRequest === 'undefined') {
 
   // processes JRD object as if it's a webfinger response object
   // looks for known properties and adds them to profile datat struct.
-  WebFinger.prototype.__processJRD = function (JRD, errorHandler, successHandler) {
+  WebFinger.prototype.__processJRD = function (URL, JRD, errorHandler, successHandler) {
     var parsedJRD = JSON.parse(JRD);
     if ((typeof parsedJRD !== 'object') ||
         (typeof parsedJRD.links !== 'object')) {
       if (typeof parsedJRD.error !== 'undefined') {
-        return errorHandler(generateErrorObject({ message: parsedJRD.error }));
+        return errorHandler(generateErrorObject({ message: parsedJRD.error, request: URL }));
       } else {
-        return errorHandler(generateErrorObject({ message: 'unknown response from server' }));
+        return errorHandler(generateErrorObject({ message: 'unknown response from server', request: URL }));
       }
-      return false;
     }
 
     var links = parsedJRD.links;
@@ -5630,20 +5688,29 @@ if (typeof XMLHttpRequest === 'undefined') {
     }
 
     var self = this;
-    var parts = address.replace(/ /g,'').split('@');
-    var host = parts[1];    // host name for this useraddress
+    var host = '';
+    if (address.indexOf('://') > -1) {
+      // other uri format
+      host = address.replace(/ /g,'').split('://')[1];
+    } else {
+      // useraddress
+      host = address.replace(/ /g,'').split('@')[1];
+    }
     var uri_index = 0;      // track which URIS we've tried already
     var protocol = 'https'; // we use https by default
 
-    if (parts.length !== 2) {
-      return cb(generateErrorObject({ message: 'invalid user address ' + address + ' ( expected format: user@host.com )' }));
-    } else if (self.__isLocalhost(host)) {
+    if (self.__isLocalhost(host)) {
       protocol = 'http';
     }
 
     function __buildURL() {
+      var uri = '';
+      if (! address.split('://')[1]) {
+        // the URI has not been defined, default to acct
+        uri = 'acct:';
+      }
       return protocol + '://' + host + '/.well-known/' +
-             URIS[uri_index] + '?resource=acct:' + address;
+             URIS[uri_index] + '?resource=' + uri + address;
     }
 
     // control flow for failures, what to do in various cases, etc.
@@ -5665,12 +5732,13 @@ if (typeof XMLHttpRequest === 'undefined') {
         //    (stored somewhere in control of the user)
         // 3. make a request to that url and get the json
         // 4. process it like a normal webfinger response
-        self.__fetchJRD(__buildURL(), cb, function (data) { // get link to users JRD
-          self.__processJRD(data, cb, function (result) {
+        var URL = __buildURL();
+        self.__fetchJRD(URL, cb, function (data) { // get link to users JRD
+          self.__processJRD(URL, data, cb, function (result) {
             if ((typeof result.idx.links.webfist === 'object') &&
                 (typeof result.idx.links.webfist[0].href === 'string')) {
               self.__fetchJRD(result.idx.links.webfist[0].href, cb, function (JRD) {
-                self.__processJRD(JRD, cb, function (result) {
+                self.__processJRD(URL, JRD, cb, function (result) {
                   return cb(null, cb);
                 });
               });
@@ -5684,8 +5752,9 @@ if (typeof XMLHttpRequest === 'undefined') {
 
     function __call() {
       // make request
-      self.__fetchJRD(__buildURL(), __fallbackChecks, function (JRD) {
-        self.__processJRD(JRD, cb, function (result) { cb(null, result); });
+      var URL = __buildURL();
+      self.__fetchJRD(URL, __fallbackChecks, function (JRD) {
+        self.__processJRD(URL, JRD, cb, function (result) { cb(null, result); });
       });
     }
 
@@ -5709,17 +5778,24 @@ if (typeof XMLHttpRequest === 'undefined') {
     }
   };
 
-  if (typeof window === 'object') {
-    window.WebFinger = WebFinger;
-  } else if (typeof (define) === 'function' && define.amd) {
-    define([], function () { return WebFinger; });
-  } else {
-    try {
-      module.exports = WebFinger;
-    } catch (e) {}
-  }
-})();
 
+
+  // AMD support
+  if (typeof define === 'function' && define.amd) {
+      define([], function () { return WebFinger; });
+  // CommonJS and Node.js module support.
+  } else if (typeof exports !== 'undefined') {
+    // Support Node.js specific `module.exports` (which can be a function)
+    if (typeof module !== 'undefined' && module.exports) {
+        exports = module.exports = WebFinger;
+    }
+    // But always support CommonJS module 1.1.1 spec (`exports` cannot be a function)
+    exports.WebFinger = WebFinger;
+  } else {
+    // browser <script> support
+    global.WebFinger = WebFinger;
+  }
+})(this);
 
 
 /** FILE: src/authorize.js **/
@@ -6288,35 +6364,19 @@ RemoteStorage.Assets = {
    **/
   RemoteStorage.Widget = function (remoteStorage) {
     var self = this;
-    var requestsToFlashFor = 0;
+
+    self.requestsToFlashFor = 0;
 
     // setting event listeners on rs events to put
     // the widget into corresponding states
     this.rs = remoteStorage;
-    this.rs.remote.on('connected', stateSetter(this, 'connected'));
     this.rs.on('disconnected', stateSetter(this, 'initial'));
     this.rs.on('connecting', stateSetter(this, 'authing'));
     this.rs.on('authing', stateSetter(this, 'authing'));
     this.rs.on('error', errorsHandler(this));
 
-    if (this.rs.remote) {
-      this.rs.remote.on('wire-busy', function (evt) {
-        if (flashFor(evt)) {
-          requestsToFlashFor++;
-          stateSetter(self, 'busy')();
-        }
-      });
-
-      this.rs.remote.on('wire-done', function (evt) {
-        if (flashFor(evt)) {
-          requestsToFlashFor--;
-        }
-        if (requestsToFlashFor <= 0 && evt.success) {
-          stateSetter(self, 'connected')();
-        }
-      });
-    }
-
+    self.initRemoteListeners();
+    
     if (hasLocalStorage) {
       var state = localStorage[LS_STATE_KEY];
       if (state && VALID_ENTRY_STATES[state]) {
@@ -6327,6 +6387,30 @@ RemoteStorage.Assets = {
 
   RemoteStorage.Widget.prototype = {
 
+      initRemoteListeners: function(){
+      var self = this;
+      
+        if (self.rs.remote) {
+          self.rs.remote.on('connected', stateSetter(this, 'connected'));
+
+          self.rs.remote.on('wire-busy', function (evt) {
+            if (flashFor(evt)) {
+              self.requestsToFlashFor++;
+              stateSetter(self, 'busy')();
+            }
+          });
+
+          self.rs.remote.on('wire-done', function (evt) {
+            if (flashFor(evt)) {
+              self.requestsToFlashFor--;
+            }
+            if (self.requestsToFlashFor <= 0 && evt.success) {
+              stateSetter(self, 'connected')();
+            }
+          });
+        }
+      },
+      
     /**
     * Method: display
     *
@@ -6426,10 +6510,10 @@ RemoteStorage.Assets = {
     return typeof(document) !== 'undefined';
   };
 
-  function stateSetter(widget, state) {
+  function stateSetter(widget, state, message) {
     RemoteStorage.log('[Widget] Producing stateSetter for', state);
     return function () {
-      RemoteStorage.log('[Widget] Setting state', state, arguments);
+      RemoteStorage.log('[Widget] Setting state', state, message);
       if (hasLocalStorage) {
         localStorage[LS_STATE_KEY] = state;
       }
@@ -6437,7 +6521,7 @@ RemoteStorage.Assets = {
         if (widget.rs.remote) {
           widget.view.setUserAddress(widget.rs.remote.userAddress);
         }
-        widget.view.setState(state, arguments);
+        widget.view.setState(state, message);
       } else {
         widget._rememberedState = state;
       }
@@ -6449,9 +6533,9 @@ RemoteStorage.Assets = {
       var s;
       if (error instanceof RemoteStorage.DiscoveryError) {
         console.error('Discovery failed', error, '"' + error.message + '"');
-        s = stateSetter(widget, 'initial', [error.message]);
+        s = stateSetter(widget, 'initial', error.message);
       } else if (error instanceof RemoteStorage.SyncError) {
-        s = stateSetter(widget, 'offline', []);
+        s = stateSetter(widget, 'offline');
       } else if (error instanceof RemoteStorage.Unauthorized) {
         s = stateSetter(widget, 'unauthorized');
       } else {
@@ -6546,13 +6630,13 @@ RemoteStorage.Assets = {
      *   state
      *   args
      **/
-    setState: function (state, args) {
-      RemoteStorage.log('[View] widget.view.setState(',state,',',args,');');
+    setState: function (state, message) {
+      RemoteStorage.log('[View] widget.view.setState(',state,',',message,');');
       var s = this.states[state];
       if (typeof(s) === 'undefined') {
         throw new Error("Bad State assigned to view: " + state);
       }
-      s.apply(this, args);
+      s.apply(this, [message]);
     },
 
     /**
@@ -10661,7 +10745,6 @@ Math.uuid = function (len, radix) {
           error = new RemoteStorage.Unauthorized();
         } else if (status.networkProblems) {
           error = new RemoteStorage.SyncError('Network request failed.');
-          this.remote.online = false;
         } else {
           error = new Error('HTTP response code ' + status.statusCode + ' received.');
         }
@@ -10692,7 +10775,6 @@ Math.uuid = function (len, radix) {
       .then(function (completed) {
         delete self._timeStarted[task.path];
         delete self._running[task.path];
-        self.remote.online = true;
 
         if (completed) {
           if (self._tasks[task.path]) {
@@ -12273,9 +12355,13 @@ Math.uuid = function (len, radix) {
   var BASE_URL = 'https://www.googleapis.com';
   var AUTH_URL = 'https://accounts.google.com/o/oauth2/auth';
   var AUTH_SCOPE = 'https://www.googleapis.com/auth/drive';
+  var SETTINGS_KEY = 'remotestorage:googledrive';
 
   var GD_DIR_MIME_TYPE = 'application/vnd.google-apps.folder';
   var RS_DIR_MIME_TYPE = 'application/json; charset=UTF-8';
+
+  var isFolder = RemoteStorage.util.isFolder;
+  var hasLocalStorage;
 
   function buildQueryString(params) {
     return Object.keys(params).map(function (key) {
@@ -12335,6 +12421,19 @@ Math.uuid = function (len, radix) {
     this.clientId = clientId;
 
     this._fileIdCache = new Cache(60 * 5); // ids expire after 5 minutes (is this a good idea?)
+
+    hasLocalStorage = RemoteStorage.util.localStorageAvailable();
+
+    if (hasLocalStorage){
+      var settings;
+      try {
+        settings = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+      } catch(e){}
+      if (settings) {
+        this.configure(settings);
+      }
+    }
+
   };
 
   RS.GoogleDrive.prototype = {
@@ -12342,15 +12441,47 @@ Math.uuid = function (len, radix) {
     online: true,
 
     configure: function (settings) { // Settings parameter compatible with WireClient
-      if (settings.token) {
-        localStorage['remotestorage:googledrive:token'] = settings.token;
-        this.token = settings.token;
-        this.connected = true;
-        this._emit('connected');
-      } else {
+      // We only update this.userAddress if settings.userAddress is set to a string or to null
+      if (typeof settings.userAddress !== 'undefined') { this.userAddress = settings.userAddress; }
+      // Same for this.token. If only one of these two is set, we leave the other one at its existing value
+      if (typeof settings.token !== 'undefined') { this.token = settings.token; }
+
+      var writeSettingsToCache = function() {
+        if (hasLocalStorage) {
+          localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+            userAddress: this.userAddress,
+            token: this.token
+          }));
+        }
+      };
+
+      var handleError = function() {
         this.connected = false;
         delete this.token;
-        delete localStorage['remotestorage:googledrive:token'];
+        if (hasLocalStorage) {
+          localStorage.removeItem(SETTINGS_KEY);
+        }
+      };
+
+      if (this.token) {
+        this.connected = true;
+
+        if (this.userAddress) {
+          this._emit('connected');
+          writeSettingsToCache.apply(this);
+        } else {
+          this.info().then(function(info) {
+            this.userAddress = info.user.emailAddress;
+            this.rs.widget.view.setUserAddress(this.userAddress);
+            this._emit('connected');
+            writeSettingsToCache.apply(this);
+          }.bind(this)).catch(function() {
+            handleError.apply(this);
+            this.rs._emit('error', new Error('Could not fetch user info.'));
+          }.bind(this));
+        }
+      } else {
+        handleError.apply(this);
       }
     },
 
@@ -12423,6 +12554,28 @@ Math.uuid = function (len, radix) {
             }
           });
         });
+      });
+    },
+
+    /**
+     * Method: info
+     *
+     * Fetches the user's info from Google and returns a promise for it.
+     *
+     * Returns:
+     *
+     *   A promise to the user's info
+     */
+    info: function () {
+      var url = BASE_URL + '/drive/v2/about?fields=user';
+      // requesting user info(mainly for userAdress)
+      return this._request('GET', url, {}).then(function (resp){
+        try {
+          var info = JSON.parse(resp.responseText);
+          return Promise.resolve(info);
+        } catch (e) {
+          return Promise.reject(e);
+        }
       });
     },
 
@@ -12642,15 +12795,45 @@ Math.uuid = function (len, radix) {
 
     _request: function (method, url, options) {
       var self = this;
+
       if (! options.headers) { options.headers = {}; }
       options.headers['Authorization'] = 'Bearer ' + self.token;
-      return RS.WireClient.request(method, url, options).then(function (xhr) {
-        // google tokens expire from time to time...
+
+      this._emit('wire-busy', {
+        method: method,
+        isFolder: isFolder(url)
+      });
+
+      return RS.WireClient.request.call(this, method, url, options).then(function(xhr) {
+        // Google tokens expire from time to time...
         if (xhr && xhr.status === 401) {
           self.connect();
           return;
+        } else {
+          if (!self.online) {
+            self.online = true;
+            self.rs._emit('network-online');
+          }
+          self._emit('wire-done', {
+            method: method,
+            isFolder: isFolder(url),
+            success: true
+          });
+
+          return Promise.resolve(xhr);
         }
-        return xhr;
+      }, function(error) {
+        if (self.online) {
+          self.online = false;
+          self.rs._emit('network-offline');
+        }
+        self._emit('wire-done', {
+          method: method,
+          isFolder: isFolder(url),
+          success: false
+        });
+
+        return Promise.reject(error);
       });
     }
   };
@@ -12726,6 +12909,8 @@ Math.uuid = function (len, radix) {
   var AUTH_URL = 'https://www.dropbox.com/1/oauth2/authorize';
   var SETTINGS_KEY = 'remotestorage:dropbox';
   var PATH_PREFIX = '/remotestorage';
+
+  var isFolder = RemoteStorage.util.isFolder;
 
   /**
    * Function: getDropboxPath(path)
@@ -12885,16 +13070,18 @@ Math.uuid = function (len, radix) {
     this._itemRefs = {};
     this._metadataCache = {};
 
+    hasLocalStorage = RemoteStorage.util.localStorageAvailable();
+
     if (hasLocalStorage){
       var settings;
       try {
-        settings = JSON.parse(localStorage[SETTINGS_KEY]);
+        settings = JSON.parse(localStorage.getItem(SETTINGS_KEY));
       } catch(e){}
       if (settings) {
         this.configure(settings);
       }
       try {
-        this._itemRefs = JSON.parse(localStorage[ SETTINGS_KEY+':shares' ]);
+        this._itemRefs = JSON.parse(localStorage.getItem(SETTINGS_KEY+':shares'));
       } catch(e) {  }
     }
     if (this.connected) {
@@ -12932,23 +13119,40 @@ Math.uuid = function (len, radix) {
       // Same for this.token. If only one of these two is set, we leave the other one at its existing value:
       if (typeof settings.token !== 'undefined') { this.token = settings.token; }
 
+      var writeSettingsToCache = function() {
+        if (hasLocalStorage) {
+          localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+            userAddress: this.userAddress,
+            token: this.token
+          }));
+        }
+      };
+
+      var handleError = function() {
+        this.connected = false;
+        if (hasLocalStorage) {
+          localStorage.removeItem(SETTINGS_KEY);
+        }
+      };
+
       if (this.token) {
         this.connected = true;
-        if ( !this.userAddress ){
+        if (this.userAddress) {
+          this._emit('connected');
+          writeSettingsToCache.apply(this);
+        } else {
           this.info().then(function (info){
-            this.userAddress = info.display_name;
+            this.userAddress = info.email;
             this.rs.widget.view.setUserAddress(this.userAddress);
             this._emit('connected');
+            writeSettingsToCache.apply(this);
+          }.bind(this)).catch(function() {
+            handleError.apply(this);
+            this.rs._emit('error', new Error('Could not fetch user info.'));
           }.bind(this));
         }
       } else {
-        this.connected = false;
-      }
-      if (hasLocalStorage){
-        localStorage[SETTINGS_KEY] = JSON.stringify({
-          userAddress: this.userAddress,
-          token: this.token
-        });
+        handleError.apply(this);
       }
     },
 
@@ -13246,7 +13450,7 @@ Math.uuid = function (len, radix) {
         self._itemRefs[path] = response.url;
 
         if (hasLocalStorage) {
-          localStorage[SETTINGS_KEY + ':shares'] = JSON.stringify(self._itemRefs);
+          localStorage.setItem(SETTINGS_KEY+':shares', JSON.stringify(self._itemRefs));
         }
 
         return Promise.resolve(url);
@@ -13295,15 +13499,49 @@ Math.uuid = function (len, radix) {
      */
     _request: function (method, url, options) {
       var self = this;
+
       if (! options.headers) { options.headers = {}; }
       options.headers['Authorization'] = 'Bearer ' + this.token;
-      return RS.WireClient.request.call(this, method, url, options).then(function (xhr) {
-        //503 means retry this later
+
+      this._emit('wire-busy', {
+        method: method,
+        isFolder: isFolder(url)
+      });
+
+      return RS.WireClient.request.call(this, method, url, options).then(function(xhr) {
+        // 503 means retry this later
         if (xhr && xhr.status === 503) {
+          if (self.online) {
+            self.online = false;
+            self.rs._emit('network-offline');
+          }
+
           return global.setTimeout(self._request(method, url, options), 3210);
         } else {
+          if (!self.online) {
+            self.online = true;
+            self.rs._emit('network-online');
+          }
+          self._emit('wire-done', {
+            method: method,
+            isFolder: isFolder(url),
+            success: true
+          });
+
           return Promise.resolve(xhr);
         }
+      }, function(error) {
+        if (self.online) {
+          self.online = false;
+          self.rs._emit('network-offline');
+        }
+        self._emit('wire-done', {
+          method: method,
+          isFolder: isFolder(url),
+          success: false
+        });
+
+        return Promise.reject(error);
       });
     },
 
@@ -13382,8 +13620,8 @@ Math.uuid = function (len, radix) {
       }, function (err) {
         this.rs.log('fetchDeltas', err);
         this.rs._emit('error', new RemoteStorage.SyncError('fetchDeltas failed.' + err));
-        promise.reject(err);
-      }).then(function () {
+        return Promise.resolve(args);
+      }.bind(this)).then(function () {
         if (self._revCache) {
           var args = Array.prototype.slice.call(arguments);
           self._revCache._activatePropagation();
@@ -13531,7 +13769,7 @@ Math.uuid = function (len, radix) {
     }
   };
 
-  //hooking and unhooking the sync
+  // Hooking and unhooking the sync
 
   function hookSync(rs) {
     if (rs._dropboxOrigSync) { return; } // already hooked
@@ -13540,6 +13778,7 @@ Math.uuid = function (len, radix) {
       return this.dropbox.fetchDelta.apply(this.dropbox, arguments).
         then(rs._dropboxOrigSync, function (err) {
           rs._emit('error', new RemoteStorage.SyncError(err));
+          return Promise.reject(err);
         });
     }.bind(rs);
   }
@@ -13550,7 +13789,7 @@ Math.uuid = function (len, radix) {
     delete rs._dropboxOrigSync;
   }
 
-  // hooking and unhooking getItemURL
+  // Hooking and unhooking getItemURL
 
   function hookGetItemURL(rs) {
     if (rs._origBaseClientGetItemURL) { return; }
@@ -13603,7 +13842,6 @@ Math.uuid = function (len, radix) {
   }
 
   RS.Dropbox._rs_init = function (rs) {
-    hasLocalStorage = RemoteStorage.util.localStorageAvailable();
     if ( rs.apiKeys.dropbox ) {
       rs.dropbox = new RS.Dropbox(rs);
     }
@@ -13619,7 +13857,7 @@ Math.uuid = function (len, radix) {
   RS.Dropbox._rs_cleanup = function (rs) {
     unHookIt(rs);
     if (hasLocalStorage){
-      delete localStorage[SETTINGS_KEY];
+      localStorage.removeItem(SETTINGS_KEY);
     }
     rs.removeEventListener('error', onErrorCb);
     rs.setBackend(undefined);
@@ -13628,19 +13866,6 @@ Math.uuid = function (len, radix) {
 
 
 /** FILE: src/safenetwork.js **/
-// For now, the safenetwork.js backend requires RS.js built with different LAUNCHER_URL (see below)
-// according to the test environment.
-//
-// Note: during SAFEnetwork testing the SAFE API is changing regularly, so if you want to build RS.js with this backend
-//       yourself, you will need to make sure that the version of safestore.js is in step with that API of the SAFEnetwork
-//       you are connecting to at the time (which changes periodically). If in doubt ask webalyst (aka happybeing).
-
-LAUNCHER_URL = 'http://localhost:8100'; // For local tests - but use http://api.safenet when live on SAFEnetwork
-//LAUNCHER_URL = 'http://api.safenet'; // For live tests using Firefox/Chrome with proxy configured, and running SAFE Launcher locally
-//LAUNCHER_URL = 'safe://api.safenet'; // For SAFE Beaker Browser, no proxy needed, and running SAFE Launcher locally
-
-ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
-
 (function (global) {
   /**
    * Class: RemoteStorage.SafeNetwork
@@ -13658,25 +13883,33 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
    * <BaseClient.getItemURL> gets hijacked to return the Dropbox public share
    * URL.
    * 
-   * mrhTODO: To use this backend, you need to specify the app's client ID like so:
+   * To use this backend, you need to provide information for SAFE authorisation:
    *
    * (start code)
    *
-   * remoteStorage.setApiKeys('safenetwork', {
-   *   clientId: 'your-client-id'
-   * });
+   * remoteStorage.setApiKeys('safenetwork', 
+   *     {   
+   *         // For details see safe-js safeAuth API
+   *         app: {
+   *             name: 'RemoteStorage Demo',        // Your app name etc.
+   *             version: '0.0.1',
+   *             vendor: 'remoteStorage',
+   *             id: 'org.remotestorage.rsdemo',    // Identifies stored data (unique per vendor)
+   *             permissions: ['SAFE_DRIVE_ACCESS'] // List of permissions to request. On authorisation, 
+   *         },                                     // holds permissions granted by user    
+   *     }
+   * ); 
    *
    * (end code)
    *
-   * An client ID can be obtained by registering your app in the Google
-   * Developers Console: https://developers.google.com/drive/web/auth/web-client
-   *
-   * Docs: https://developers.google.com/drive/web/auth/web-client#create_a_client_id_and_client_secret
    **/
+
+  ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
 
   var RS = RemoteStorage;
   
-  var hasLocalStorage;// mrhTODO look at use of this
+  var isFolder = RemoteStorage.util.isFolder;
+  var hasLocalStorage;
   var SETTINGS_KEY = 'remotestorage:safenetwork';
   var PATH_PREFIX = '/remotestorage/';  // mrhTODO app configurable?
   
@@ -13717,16 +13950,17 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
   var onErrorCb;
 
   RS.SafeNetwork = function (remoteStorage, clientId) {
-
     this.rs = remoteStorage;
     this.clientId = clientId;
     this._fileInfoCache = new Cache(60 * 5); // mrhTODO: info expires after 5 minutes (is this a good idea?)
-
     this.connected = false;
-
     var self = this;
 
+    hasLocalStorage = RemoteStorage.util.localStorageAvailable();
+
     onErrorCb = function (error){
+      // mrhTODO should this affect this.connected, this.online and emit network-offline?
+      
       if (error instanceof RemoteStorage.Unauthorized) {
 
         // Delete all the settings - see the documentation of
@@ -13744,40 +13978,82 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
           permissions: null,    // List of granted SAFE Network access permssions (e.g. 'SAFE_DRIVE_ACCESS')
         });
       }
-    };
+    };    
 
-    RS.eventHandling(this, 'change', 'connected', 'wire-busy', 'wire-done', 'not-connected');
+    // Events that we either handle, or emit on self
+    RS.eventHandling(this, 'connected', 'not-connected', 'wire-busy', 'wire-done');
     this.rs.on('error', onErrorCb);
 
-    // mrhTODO port dropbox style load/save settings from localStorage
+    if (hasLocalStorage){
+      var settings;
+      try {
+        settings = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+      } catch(e) {
+        localStorage.removeItem(SETTINGS_KEY);  // Clear broken settings
+      }
+      
+      if (settings)
+        this.configure(settings);
+    }
+    
 };
 
   RS.SafeNetwork.prototype = {
     connected: false,
     online: true,
     isPathShared: true,         // App private storage mrhTODO shared or private? app able to control?
-    launcherUrl: LAUNCHER_URL,  // Can be overridden by App
         
-    configure: function (settings) { // Settings parameter compatible with WireClient
-      // mrhTODO: review dropbox approach later
-      
-      if (settings.token) {
-        localStorage['remotestorage:safenetwork:token'] = settings.token;
-        this.token = settings.token;
-        this.connected = true;
-        this.permissions = settings.permissions;    // List of permissions approved by the user
+    configure: function (settings) {
+      // We only update this.userAddress if settings.userAddress is set to a string or to null:
+      if (typeof settings.userAddress !== 'undefined') { this.userAddress = settings.userAddress; }
+      // Same for this.token. If only one of these two is set, we leave the other one at its existing value:
+      if (typeof settings.token !== 'undefined') { this.token = settings.token; }
 
-        this._emit('connected');
-        RS.log('SafeNetwork.configure() [CONNECTED]');
-      } else {
+      var writeSettingsToCache = function() {
+        if (hasLocalStorage) {
+          localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+            userAddress: this.userAddress,
+            token: this.token,
+            permissions: this.permissions,
+          }));
+        }
+      };
+
+      var handleError = function() {
         this.connected = false;
-        delete this.token;
-        this.permissions = null;
-        delete localStorage['remotestorage:safenetwork:token'];
+        delete this.permissions;
+        
+        if (hasLocalStorage) {
+          localStorage.removeItem(SETTINGS_KEY);
+        }
         RS.log('SafeNetwork.configure() [DISCONNECTED]');
+      };
+
+      if (this.token) {
+        this.connected = true;
+        this.permissions = settings.permissions;
+        if (this.userAddress) {
+          this._emit('connected');
+          writeSettingsToCache.apply(this);
+          RS.log('SafeNetwork.configure() [CONNECTED-1]');
+        } else {
+          // mrhTODO if SN implements account names implement in SafeNetwork.info:
+          this.info().then(function (info){
+            this.userAddress = info.accountName;
+            this.rs.widget.view.setUserAddress(this.userAddress);
+            this._emit('connected');
+            writeSettingsToCache.apply(this);
+            RS.log('SafeNetwork.configure() [CONNECTED]-2');
+          }.bind(this)).catch(function() {
+            handleError.apply(this);
+            this._emit('error', new Error('Could not fetch account info.'));
+          }.bind(this));
+        }
+      } else {
+        handleError.apply(this);
       }
     },
-
+    
     connect: function () {
       RS.log('SafeNetwork.connect()...');
 
@@ -13785,34 +14061,112 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
       // mrhTODO: note dropbox connect skips auth if it has a token - enables it to remember connection across sessions
       // mrhTODO: if storing Authorization consider security risk - e.g. another app could steal to access SAFE Drive?
       this.rs.setBackend('safenetwork');
+      this._setBackendExtras('safenetwork');
       this.safenetworkAuthorize(this.rs.apiKeys['safenetwork']);
     },
 
+    // SafeNetwork is the first backend that doesn't involve a re-direct, and so
+    // doesn't trigger RS._init() upon successful authorisation. So we have to
+    // do a bit more here to ensure what happens at the end of RS loadFeatures()
+    // as a result of the redirect is also done without it.
+    //
+    // mrhTODO - this should probably go in the RS setBackend()
+    _setBackendExtras: function () {
+      var rs = this.rs;
+
+      // Missing from RS.setBackend()
+      // Needed to ensure we're the active backend or sync won't start 
+      // if:
+      //    - this backend was not already set in localStorage on load, *and*
+      //    - this backend doesn't do a redirect (page reload) after authorisation
+      //
+      // See: https://github.com/theWebalyst/remotestorage.js/issues/1#
+      //
+      if (this.rs.backend === 'safenetwork' && typeof this.rs._safenetworkOrigRemote === 'undefined') {
+        this.rs._safenetworkOrigRemote = this.rs.remote;
+        this.rs.remote = this.rs.safenetwork;
+        this.rs.sync.remote = this.rs.safenetwork;
+
+        // mrhTODO - this doesn't check that the event listener hasn't already been installed - should it?
+        
+        // mrhTODO - hope fireReady() only matters in RS _init() (see below)
+        
+        if (rs.widget)
+          rs.widget.initRemoteListeners();
+
+        this.on('connected', function (){
+          //fireReady();
+          rs._emit('connected');
+        });
+        this.on('not-connected', function (){
+          //fireReady();
+          rs._emit('not-connected');
+        });
+        
+        if (this.connected) {
+          //fireReady();
+          rs._emit('connected');
+        }
+
+        if (!rs.hasFeature('Authorize')) {
+          this.stopWaitingForToken();
+        }
+      }
+    },
+
+    
     stopWaitingForToken: function () {
       if (!this.connected) {
         this._emit('not-connected');
       }
     },
 
+    reflectNetworkStatus: function (isOnline){
+      if (this.online != isOnline) {
+        this.online = isOnline;
+        RS.log('reflectNetworkStatus() emitting: ' + (isOnline ? 'network-online' : 'network-offline'));
+        this.rs._emit(isOnline ? 'network-online' : 'network-offline');
+      }
+    },
+
     safenetworkAuthorize: function (appApiKeys) {
       var self = this;
       self.appKeys = appApiKeys.app;
-      
+
       tokenKey = SETTINGS_KEY + ':token';
-      window.safeAuth.authorise(self.appKeys, tokenKey).then( function(res) {   // mrhTODO - am leaving off local storage key
-        // Save session info
+      window.safeAuth.authorise(self.appKeys, tokenKey).then( function(response) {
         self.configure({ 
-            token:          res.token,                  // Auth token
-            permissions:    res.permissions,   // List of permissions approved by the user
+            token:          response.token,         // Auth token
+            permissions:    response.permissions,   // List of permissions approved by the user
           });
-      }, (err) => {
+        
+      }, function (err){
+        self.reflectNetworkStatus(false);
         RS.log('SafeNetwork Authorisation Failed');
         RS.log(err);
       });
     },
+
     
+    // mrhTODO Adapted from remotestorage.js
+    _wrapBusyDone: function (result, method, path) {
+      var self = this;
+      var folderFlag = isFolder(path);
+      
+      self._emit('wire-busy', { method: method, isFolder: folderFlag });
+      return result.then(function (r) {
+        self._emit('wire-done', { method: method, success: true, isFolder: folderFlag });
+        return Promise.resolve(r);
+      }, function (err) {
+        self._emit('wire-done', { method: method, success: false, isFolder: folderFlag });
+        return Promise.reject(err);
+      });
+    },
+
     // For reference see WireClient#get (wireclient.js)
-    get: function (path, options) {
+    get: function (path, options) {        return this._wrapBusyDone.call(this, this._get(path, options), "get", path); },
+
+    _get: function (path, options) {
       RS.log('SafeNetwork.get(' + path + ',...)' );
       var fullPath = ( PATH_PREFIX + '/' + path ).replace(/\/+/g, '/');
 
@@ -13836,7 +14190,9 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
     // mrhTODO      FIX: when API stable, best may be to store contentType in the file not as metadata
     // mrhTODO           when API stable, best may be to store contentType in the file not as metadata
     
-    put: function (path, body, contentType, options) {
+    put: function (path, body, contentType, options) {        return this._wrapBusyDone.call(this, this._put(path, body, contentType, options), "put", path); },
+
+    _put: function (path, body, contentType, options) {
       RS.log('SafeNetwork.put(' + path + ', ' + (options ? ( '{IfMatch: ' + options.IfMatch + ', IfNoneMatch: ' + options.IfNoneMatch + '})') : 'null)' ) );
       var fullPath = ( PATH_PREFIX + '/' + path ).replace(/\/+/g, '/');
 
@@ -13844,15 +14200,15 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
       var self = this;
       function putDone(response) {
         RS.log('SafeNetwork.put putDone(statusCode: ' + response.statusCode + ') for path: ' + path );
-
-        // mrhTODO SAFE API v0.5: _createFile/_updateFile lack version support
+        
+        // mrhTODO SAFE API v0.6: _createFile/_updateFile lack version support
         // mrhTODO so the response.statusCode checks here are untested
         if (response.statusCode >= 200 && response.statusCode < 300) {
           return self._getFileInfo(fullPath).then( function (fileInfo){
             
             var etagWithoutQuotes = ( typeof(fileInfo.ETag) === 'string' ? fileInfo.ETag : undefined );            
             return Promise.resolve({statusCode: 200, 'contentType': contentType, revision: etagWithoutQuotes});
-          }, (err) => {
+          }, function (err){
             RS.log('REJECTING!!! ' + err.message)
             return Promise.reject(err);
           });
@@ -13872,7 +14228,7 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
         } else {
           return self._createFile(fullPath, body, contentType, options).then(putDone);
         }
-      }, (err) => {
+      }, function (err){
         RS.log('REJECTING!!! ' + err.message)
         return Promise.reject(err);
       });
@@ -13883,7 +14239,9 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
     // mrhTODO:       be deleted from the SAFE NFS drive, and so on for its parent folder as 
     // mrhTODO:       needed. This is not done currently.
     //
-    'delete': function (path, options) {
+    delete: function (path, options) {        return this._wrapBusyDone.call(this, this._delete(path, options), "delete", path); },
+
+    _delete: function (path, options) {
       RS.log('SafeNetwork.delete(' + path + ',...)' );
       var fullPath = ( PATH_PREFIX + '/' + path ).replace(/\/+/g, '/');
 
@@ -13905,25 +14263,42 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
         return deleteFunction(self.token, fullPath, self.isPathShared).then(function (success){
           // mrhTODO must handle: if file doesn't exist also do self._fileInfoCache.delete(fullPath);
 
+          self.reflectNetworkStatus(true);   // mrhTODO - should be true, unless 401 - Unauthorized
+
           if (success) {
             self._fileInfoCache.delete(fullPath);
             return Promise.resolve({statusCode: 200});
           } else {
             return Promise.reject('safeNFS deleteFunction("' + fullPath + '") failed: ' + success );
           }
-        }, (err) => {
-          RS.log('REJECTING!!! deleteFunction("' + fullPath + '") failed: ' + err.errorCode + ' ' + err.description)
+        }, function (err){
+          RS.log('REJECTING!!! deleteFunction("' + fullPath + '") failed: ' + err.message)
           return Promise.reject(err);
         });
 
-      }, (err) => {
+      }, function (err){
+        self.reflectNetworkStatus(false);
         RS.log('REJECTING!!! ' + err.message)
         return Promise.reject(err);
       });
     },
 
-    // mrhTODO - replace _updateFile / _createFile with single _putFile (as POST /nfs/file now does both)
-    // mrhTODO contentType is ignored on update (to change it would require file delete and create before update)
+    /**
+     * Method: info
+     *
+     * Fetches an account name for display in widget
+     *
+     * Returns:
+     *
+     *   A promise to the user's account info
+     */
+    info: function () {        return this._wrapBusyDone.call(this, this._info(), "get", ''); },
+
+    _info: function () {
+      // Not yet implemented on SAFE, so provdie a default
+      return Promise.resolve({accountName: 'SafeNetwork'});
+    },
+
     _updateFile: function (fullPath, body, contentType, options) {
       RS.log('SafeNetwork._updateFile(' + fullPath + ',...)' );
       var self = this;
@@ -13935,13 +14310,17 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
       }
 */
       
-      return window.safeNFS.createFile(self.token, fullPath, body, contentType, body.length, null, self.isPathShared).then(function (response) {
+      return window.safeNFS.createOrUpdateFile(self.token, fullPath, body, contentType, body.length, null, self.isPathShared).then(function (result) {
         // self._shareIfNeeded(fullPath);  // mrhTODO what's this? (was part of dropbox.js)
 
+        var response = { statusCode: ( result ? 200 : 400  ) }; // mrhTODO currently just a response that resolves to truthy (may be extended to return status?)
+        self.reflectNetworkStatus(true);
+        
         self._fileInfoCache.delete(fullPath);     // Invalidate any cached eTag
-        return response;
-      }, (err) => {
-        RS.log('REJECTING!!! safeNFS.createFile("' + fullPath + '") failed: ' + err.errorCode + ' ' + err.description)
+        return Promise.resolve( response );
+      }, function (err){
+        self.reflectNetworkStatus(false);                // mrhTODO - should go offline for Unauth or Timeout
+        RS.log('REJECTING!!! safeNFS.createOrUpdateFile("' + fullPath + '") failed: ' + err.message)
         return Promise.reject(err);
       });
     },
@@ -13953,17 +14332,21 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
       // Ensure path exists by recursively calling create on parent folder
       return self._makeParentPath(fullPath).then(function (parentPath) {
         
-        return window.safeNFS.createFile(self.token, fullPath, body, contentType, body.length, null, self.isPathShared).then(function (response) {
+        return window.safeNFS.createFile(self.token, fullPath, body, contentType, body.length, null, self.isPathShared).then(function (result) {
           // self._shareIfNeeded(fullPath);  // mrhTODO what's this?
-          
+
+          var response = { statusCode: ( result ? 200 : 400  ) }; // mrhTODO currently just a response that resolves to truthy (may be extended to return status?)
+          self.reflectNetworkStatus(true);
+
           self._fileInfoCache.delete(fullPath);     // Invalidate any cached eTag
-          return Promise.resolve({statusCode: 200});
-        }, (err) => {
-          RS.log('REJECTING!!! _createFile("' + fullPath + '") failed: ' + err.errorCode + ' ' + err.description)
+          return Promise.resolve(response);
+        }, function (err){
+          self.reflectNetworkStatus(false);                // mrhTODO - should go offline for Unauth or Timeout
+          RS.log('REJECTING!!! _createFile("' + fullPath + '") failed: ' + err.message)
           return Promise.reject(err);
         });
-      }, (err) => {
-        RS.log('REJECTING!!! _makeParentPath("' + fullPath + '") failed: ' + err.errorCode + ' ' + err.description)
+      }, function (err){
+        RS.log('REJECTING!!! _makeParentPath("' + fullPath + '") failed: ' + err.message)
         return Promise.reject(err);
       });
     },
@@ -13984,8 +14367,8 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
         if (ENABLE_ETAGS && options && options.ifNoneMatch && etagWithoutQuotes && (etagWithoutQuotes === options.ifNoneMatch)) {
           return Promise.resolve({statusCode: 304});
         }
-          
-        return window.safeNFS.getFile(self.token, fullPath, self.isPathShared).then(function (body) {
+        
+        return window.safeNFS.getFile(self.token, fullPath, 'json', self.isPathShared).then(function (body) {
           
           /* SAFE NFS API file-metadata - disabled for now:
           var fileMetadata = response.getResponseHeader('file-metadata');
@@ -14009,12 +14392,14 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
             retResponse.contentType = fileInfo['Content-Type'];
           }
          
+          self.reflectNetworkStatus(true);
           return Promise.resolve( retResponse );
-        }, (err) => {
-          RS.log('REJECTING!!! safeNFS.getFile("' + fullPath + '") failed: ' + err.errorCode + ' ' + err.description)
+        }, function (err){
+          self.reflectNetworkStatus(false);                // mrhTODO - should go offline for Unauth or Timeout
+          RS.log('REJECTING!!! safeNFS.getFile("' + fullPath + '") failed: ' + err.message)
           return Promise.reject({statusCode: 404}); // mrhTODO can we get statusCode from err?
         });
-      }, (err) => {
+      }, function (err){
         RS.log('REJECTING!!! ' + err.message)
         return Promise.reject(err);
       });
@@ -14045,6 +14430,7 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
         RS.log('safeNFS.getDir(token, ' + fullPath + ', isPathShared = ' + self.isPathShared + ')' );
         return window.safeNFS.getDir(self.token, fullPath, self.isPathShared).then(function (body) {
 
+          self.reflectNetworkStatus(true);
           var listing, listingFiles, listingSubdirectories, mime, rev;
           if (body.info) {
             var folderETagWithoutQuotes = fullPath + '-' + body.info.createdOn + '-' + body.info.modifiedOn;
@@ -14116,11 +14502,23 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
 
           RS.log('SafeNetwork._getFolder(' + fullPath + ', ...) RESULT: lising contains ' + JSON.stringify( listing ) );
           return Promise.resolve({statusCode: 200, body: listing, meta: folderMetadata, contentType: RS_DIR_MIME_TYPE/*, mrhTODO revision: folderETagWithoutQuotes*/ });
-        }, (err) => {
-          RS.log('safeNFS.getDir("' + fullPath + '") failed: ' + err )
-          return Promise.reject({statusCode: 404}); // mrhTODO can we get statusCode from err?
+        }, function (err){
+          self.reflectNetworkStatus(false);                // mrhTODO - should go offline for Unauth or Timeout
+          RS.log('safeNFS.getDir("' + fullPath + '") failed: ' + err.status );
+          //var status = (err == 'Unauthorized' ? 401 : 404); // mrhTODO ideally safe-js would provide response code (possible enhancement)
+          if (err.status === undefined)
+              err.status = 401; // Force Unauthorised, to handle issue in safe-js: 
+          
+          if (err.status == 401){
+            // Modelled on how googledrive.js handles expired token
+            if (self.connected){
+              self.connect();
+              return;
+            }
+          }
+          return Promise.reject({statusCode: err.status});
         });
-      }, (err) => {
+      }, function (err){
         RS.log('_getFileInfo("' + fullPath + '") failed: ' + err)
         return Promise.reject(err);
       });
@@ -14137,7 +14535,7 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
         } else {
           return self._createFolder(parentFolder);
         }
-      }, (err) => {
+      }, function (err){
         RS.log('REJECTING!!! ' + err.message)
         return Promise.reject(err);
       });
@@ -14158,14 +14556,16 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
 
         return window.safeNFS.createDir(self.token, folderPath, self.isPrivate, self.userMetadata, self.isPathShared).then(function (response) {
 //          self._shareIfNeeded(folderPath);  // mrhTODO what's this? (was part of dropbox.js)
+          self.reflectNetworkStatus(true);
           return Promise.resolve(response);
-        }, (err) => {
-          RS.log('safeNFS.createDir("' + folderPath + '") failed: ' + err.errorCode + ' ' + err.description)
+        }, function (err){
+          self.reflectNetworkStatus(false);                // mrhTODO - should go offline for Unauth or Timeout
+          RS.log('safeNFS.createDir("' + folderPath + '") failed: ' + err.message)
           return Promise.reject({statusCode: 404}); // mrhTODO can we get statusCode from err?
         });
 
-      }, (err) => {
-        RS.log('_makeParentPath("' + folderPath + '") failed: ' + err.errorCode + ' ' + err.description)
+      }, function (err){
+        RS.log('_makeParentPath("' + folderPath + '") failed: ' + err.message)
         return Promise.reject(err);
       });
     },
@@ -14213,7 +14613,7 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
           if (fullPath.substr(-1) === '/') {    // folder, so create it
             return self._createFolder(fullPath).then(function () {
               return self._getFileInfo(fullPath);
-            }, (err) => {
+            }, function (err){
               RS.log('_createFolder("' + fullPath + '") ERROR statusCode: ' + err.statusCode )
               return Promise.reject(err);
             });
@@ -14225,7 +14625,7 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
         }
         
         return Promise.resolve(info);         // Pass back info (null if doesn't exist)
-      }, (err) => {
+      }, function (err){
         RS.log('_getFolder("' + parentPath(fullPath) + '") ERROR statusCode: ' + err.statusCode )
         return Promise.reject(err);
       });
@@ -14243,13 +14643,15 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
   // mrhTODO and may cause problems with starting sync?
   // mrhTODO Maybe the hookIt stuff in Dropbox allows chaining, but not yet in GD or SN?
   //
+  
   RS.SafeNetwork._rs_init = function (remoteStorage) {
+    hasLocalStorage = RemoteStorage.util.localStorageAvailable();
 
     var config = remoteStorage.apiKeys.safenetwork;
     if (config) {
       remoteStorage.safenetwork = new RS.SafeNetwork(remoteStorage, config.clientId);
-      if (remoteStorage.backend === 'safenetwork') {
-        remoteStorage._origRemote = remoteStorage.remote;
+      if (remoteStorage.backend === 'safenetwork' && remoteStorage.remote !== remoteStorage.safenetwork) {
+        remoteStorage._safenetworkOrigRemote = remoteStorage.remote;
         remoteStorage.remote = remoteStorage.safenetwork;
       }
     }
@@ -14262,9 +14664,9 @@ ENABLE_ETAGS = true;   // false disables ifMatch / ifNoneMatch checks
   // mrhTODO see dropbox version
   RS.SafeNetwork._rs_cleanup = function (remoteStorage) {
     remoteStorage.setBackend(undefined);
-    if (remoteStorage._origRemote) {
-      remoteStorage.remote = remoteStorage._origRemote;
-      delete remoteStorage._origRemote;
+    if (remoteStorage._safenetworkOrigRemote) {
+      remoteStorage.remote = remoteStorage._safenetworkOrigRemote;
+      delete remoteStorage._safenetworkOrigRemote;
     }
   };
 
