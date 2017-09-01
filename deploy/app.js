@@ -21,21 +21,25 @@
     
     // mrhTODO - review...
     // SAFE Network backend requires application identity and required permissions rather than
-    // API keys (authentication is handled by the user via SAFE Launcher, not a server)
+    // API keys (authentication with SN is done by SAFE Browser itself, not via HTTP server).
     remoteStorage.setApiKeys('safenetwork', 
         {   
-            // For details see SAFE Launcher /auth JSON API
+            // For details see SAFE DOM API (safeApp.initialise / safe.App.authorise)
             app: {
-                name: 'My Favorite Drinks (RS.js demo)',        // Your app name etc.
-                version: '0.0.1',
+                name: 'My Favorite Drinks (RS.js demo)',    // Your app name etc.
                 vendor: 'remoteStorage',
-                id: 'org.remotestorage.rsdemo',      // Identifies stored data (unique per vendor)
-            permissions: ['SAFE_DRIVE_ACCESS']   // List of permissions to request. On authorisation, 
-                                               // holds permissions granted by user
-            },
-            // mrhTODO: clientId not used on SAFEnetwork - any equivalent?
-            //   purpose of clientId is to show the app is allowed to access user data
-            clientId: 'placeholder'
+                id: 'org.remotestorage',    // Identifies app specific 'own_container' (see below)
+
+                permissions: {  // List of containers requested permissions. On authorisation, 
+                                // holds permissions granted by user
+/* mrhTODO try a shared _remotestorage container */
+                  _public: ['Insert', 'Update'], // request to insert into `_public` container
+                  _other: ['Insert', 'Update'],  // request to insert and update in `_other` container
+                },
+                options: {
+                  own_container:  true,         // App specific container (based on name, vendor & id above)
+                },
+            }
         }
     );
     
